@@ -1,0 +1,971 @@
+<title>Carbon Desk: Veltara Systems</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Space+Grotesk:wght@500;700&display=swap">
+<style>
+/* Layout: a physical laptop on a desk; inside, a small OS with a dock of apps. One app window at a time. */
+:root{
+  --desk:#e7ebe8; --desk-2:#d9dfdb;
+  --shell:#2b2f33; --shell-edge:#1b1e21; --bezel:#0f1113;
+  --bg:#f6f8f7; --panel:#ffffff; --panel-2:#eef2f0; --line:#d6ddd9;
+  --fg:#18211d; --muted:#5b6862; --faint:#8a9690;
+  --accent:#0f7a5c; --accent-2:#0b5e47; --accent-soft:#dff1ea;
+  --warn:#a86400; --warn-soft:#fbefd9; --bad:#b4352b; --bad-soft:#f9e1de; --good:#1f7a3a; --good-soft:#e1f3e5;
+  --paper:#fffefb; --paper-ink:#222;
+  --font:'IBM Plex Sans',system-ui,-apple-system,Segoe UI,sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
+  --display:'Space Grotesk','IBM Plex Sans',system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --desk:#121614; --desk-2:#0c0f0e; --shell:#3a3f44; --shell-edge:#24282c; --bezel:#050606;
+  --bg:#151a18; --panel:#1c2220; --panel-2:#232a27; --line:#323b37;
+  --fg:#e6ece9; --muted:#a3b0aa; --faint:#75827c;
+  --accent:#3fbf93; --accent-2:#6fd6b0; --accent-soft:#163a2f;
+  --warn:#e2a64b; --warn-soft:#3a2c12; --bad:#ef7d72; --bad-soft:#3d1d1a; --good:#6cc684; --good-soft:#18331f;
+  --paper:#f4f1ea; --paper-ink:#1d1d1d; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --desk:#121614; --desk-2:#0c0f0e; --shell:#3a3f44; --shell-edge:#24282c; --bezel:#050606;
+  --bg:#151a18; --panel:#1c2220; --panel-2:#232a27; --line:#323b37;
+  --fg:#e6ece9; --muted:#a3b0aa; --faint:#75827c;
+  --accent:#3fbf93; --accent-2:#6fd6b0; --accent-soft:#163a2f;
+  --warn:#e2a64b; --warn-soft:#3a2c12; --bad:#ef7d72; --bad-soft:#3d1d1a; --good:#6cc684; --good-soft:#18331f;
+  --paper:#f4f1ea; --paper-ink:#1d1d1d; color-scheme:dark}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{background:radial-gradient(120% 80% at 50% 0%,var(--desk),var(--desk-2));color:var(--fg);font-family:var(--font);font-size:14px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.stage{max-width:1240px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:14px}
+.caption{font-family:var(--display);font-size:13px;color:var(--muted);letter-spacing:.04em;text-transform:uppercase;text-align:center}
+.caption b{color:var(--fg)}
+.laptop{width:100%}
+.lid{background:var(--shell);border-radius:18px 18px 6px 6px;padding:14px 14px 18px;box-shadow:0 1px 0 var(--shell-edge) inset,0 30px 60px -30px rgba(0,0,0,.45)}
+.cam{width:6px;height:6px;border-radius:50%;background:#444b51;margin:-6px auto 8px}
+.screen{background:var(--bezel);border-radius:8px;padding:3px;overflow:hidden}
+.base{height:16px;background:linear-gradient(var(--shell),var(--shell-edge));border-radius:0 0 22px 22px;margin:0 -2.5%;position:relative}
+.base::after{content:"";position:absolute;left:50%;top:0;width:14%;height:6px;transform:translateX(-50%);background:var(--shell-edge);border-radius:0 0 8px 8px}
+.os{height:min(78vh,780px);min-height:560px;background:var(--bg);border-radius:5px;display:grid;grid-template-rows:auto 1fr auto;overflow:hidden;position:relative}
+/* top bar */
+.topbar{display:flex;align-items:center;gap:14px;padding:6px 12px;background:var(--panel);border-bottom:1px solid var(--line);font-size:12px;flex-wrap:wrap}
+.brand{font-family:var(--display);font-weight:700;letter-spacing:.02em;display:flex;align-items:center;gap:6px}
+.brand i{width:10px;height:10px;border-radius:3px;background:var(--accent);display:inline-block}
+.kpis{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}
+.kpi{display:flex;align-items:center;gap:6px;padding:3px 8px;border-radius:999px;background:var(--panel-2);font-variant-numeric:tabular-nums;white-space:nowrap}
+.kpi b{font-weight:600}
+.kpi .bar{width:46px;height:5px;border-radius:3px;background:var(--line);overflow:hidden}
+.kpi .bar span{display:block;height:100%;background:var(--accent)}
+.kpi.days b{color:var(--fg)}
+.kpi.days.low b{color:var(--bad)}
+.clock{color:var(--muted);font-family:var(--mono)}
+/* window */
+.desktop{position:relative;overflow:hidden;padding:10px;min-height:0}
+.win{height:100%;background:var(--panel);border:1px solid var(--line);border-radius:10px;display:flex;flex-direction:column;overflow:hidden;min-height:0}
+.winbar{display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px solid var(--line);background:var(--panel-2)}
+.dots{display:flex;gap:5px}.dots i{width:10px;height:10px;border-radius:50%;background:var(--line)}
+.wintitle{font-weight:600;font-size:13px}
+.winsub{color:var(--muted);font-size:12px;margin-left:auto}
+.winbody{flex:1;min-height:0;display:flex;overflow:hidden}
+.scroll{overflow:auto;min-height:0}
+/* dock */
+.dock{display:flex;justify-content:center;gap:6px;padding:8px;background:var(--panel);border-top:1px solid var(--line);flex-wrap:wrap}
+.app{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;border:0;background:none;padding:4px 8px;border-radius:8px;color:var(--muted);font-size:11px;min-width:64px}
+.app svg{width:26px;height:26px}
+.app.on{background:var(--accent-soft);color:var(--accent-2)}
+.app:hover{color:var(--fg)}
+.badge{position:absolute;top:0;right:10px;background:var(--bad);color:#fff;border-radius:999px;font-size:10px;min-width:16px;height:16px;line-height:16px;padding:0 4px;font-weight:600}
+/* mail */
+.list{width:300px;flex:none;border-right:1px solid var(--line);overflow:auto}
+.mail-item{display:block;width:100%;text-align:left;border:0;background:none;border-bottom:1px solid var(--line);padding:10px 12px;display:grid;gap:2px}
+.mail-item.sel{background:var(--accent-soft)}
+.mail-item .from{font-weight:600;display:flex;justify-content:space-between;gap:8px}
+.mail-item .from time{font-weight:400;color:var(--faint);font-size:11px;font-family:var(--mono)}
+.mail-item .subj{font-size:13px}
+.mail-item .snip{color:var(--muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mail-item.unread .subj{font-weight:600}
+.mail-item.unread .from>span::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--accent);display:inline-block;margin-right:6px;vertical-align:middle}
+.mail-item .tag{font-size:10px;font-family:var(--mono);color:var(--accent-2);text-transform:uppercase;letter-spacing:.06em}
+.mail-item .tag.done{color:var(--faint)}
+.read{flex:1;min-width:0;overflow:auto;padding:18px 22px 40px}
+.read h2{font-family:var(--display);font-size:20px;margin:0 0 10px;text-wrap:balance}
+.hdr{display:flex;gap:10px;align-items:center;margin-bottom:14px}
+.avatar{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-weight:600;color:#fff;flex:none;font-size:13px}
+.hdr .who{font-weight:600}.hdr .role{color:var(--muted);font-size:12px}
+.body{line-height:1.6;max-width:70ch}
+.body p{margin:0 0 10px}
+.body ul{margin:0 0 10px;padding-left:20px}
+.atts{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+.att{display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--panel-2);border-radius:8px;padding:7px 10px;font-size:12px}
+.att .ext{font-family:var(--mono);font-size:10px;padding:2px 5px;border-radius:4px;background:var(--accent);color:#fff;text-transform:uppercase}
+.att .ext.pdf{background:#b4352b}.att .ext.xlsx,.att .ext.csv{background:#1f7a3a}
+/* task panel */
+.task{border:1px solid var(--line);border-radius:10px;margin-top:18px;overflow:hidden;max-width:78ch}
+.task-h{background:var(--panel-2);padding:9px 14px;font-size:11px;font-family:var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--accent-2);display:flex;justify-content:space-between;gap:8px}
+.task-b{padding:14px}
+.q{font-weight:600;margin:0 0 10px;line-height:1.45}
+.opt{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:8px;padding:9px 11px;margin-bottom:7px;cursor:pointer;line-height:1.45}
+.opt input{margin-top:3px}
+.opt:hover{border-color:var(--accent)}
+.opt.chosen{border-color:var(--accent);background:var(--accent-soft)}
+.opt.lock{cursor:default}
+.btn{border:0;background:var(--accent);color:#fff;padding:8px 14px;border-radius:7px;font-weight:600}
+.btn:hover{background:var(--accent-2)}
+.btn.ghost{background:none;color:var(--accent-2);border:1px solid var(--line)}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.fb{border-radius:8px;padding:10px 12px;margin-top:10px;line-height:1.5;font-size:13px}
+.fb.best{background:var(--good-soft)}.fb.ok{background:var(--warn-soft)}.fb.bad{background:var(--bad-soft)}
+.fb b.t{display:block;margin-bottom:3px}
+.fb .ref{display:block;margin-top:6px;color:var(--muted);font-size:12px;font-family:var(--mono)}
+.fx{display:inline-flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+.fx span{font-family:var(--mono);font-size:11px;padding:1px 6px;border-radius:4px;background:var(--panel)}
+.check-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:6px;margin-bottom:10px}
+.check{display:flex;gap:8px;align-items:flex-start;border:1px solid var(--line);border-radius:7px;padding:7px 9px;font-size:13px;line-height:1.35}
+.check.right{border-color:var(--good);background:var(--good-soft)}.check.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.check small{display:block;color:var(--muted);font-size:11.5px;margin-top:2px}
+.done-tag{font-family:var(--mono);font-size:11px;color:var(--good)}
+/* files */
+.tree{width:220px;flex:none;border-right:1px solid var(--line);overflow:auto;padding:8px 0}
+.folder{padding:6px 14px;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--faint);font-family:var(--mono);margin-top:6px}
+.file{display:flex;gap:8px;width:100%;border:0;background:none;text-align:left;padding:6px 14px;font-size:12.5px;align-items:center}
+.file.sel{background:var(--accent-soft)}
+.file.new::after{content:"new";font-size:9px;font-family:var(--mono);background:var(--accent);color:#fff;border-radius:3px;padding:0 4px;margin-left:auto}
+.viewer{flex:1;min-width:0;overflow:auto;padding:18px;background:var(--panel-2)}
+.paper{background:var(--paper);color:var(--paper-ink);max-width:760px;margin:0 auto;border-radius:3px;box-shadow:0 1px 3px rgba(0,0,0,.15);padding:28px 32px;font-size:13px;line-height:1.5}
+.paper h3{font-family:var(--display);margin:0 0 4px;font-size:18px}
+.paper .meta{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:11.5px;color:#555;border-bottom:2px solid #222;padding-bottom:8px;margin-bottom:12px}
+.paper .logo{font-family:var(--display);font-weight:700;font-size:15px;letter-spacing:.02em}
+.paper table{border-collapse:collapse;width:100%;margin:8px 0 12px;font-variant-numeric:tabular-nums}
+.paper th,.paper td{border-bottom:1px solid #ddd;padding:5px 6px;text-align:left;vertical-align:top}
+.paper th{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:#555;background:#f3f1ec}
+.paper td.n,.paper th.n{text-align:right}
+.paper .stamp{display:inline-block;border:2px solid #b4352b;color:#b4352b;padding:2px 8px;font-family:var(--mono);font-size:11px;transform:rotate(-3deg)}
+.paper .note{background:#f6f1e2;border-left:3px solid #c9a23d;padding:8px 10px;margin:10px 0;font-size:12.5px}
+.paper .fine{font-size:11px;color:#666}
+.sheet{background:var(--panel);border:1px solid var(--line);border-radius:4px;overflow:auto;max-width:100%}
+.sheet table{border-collapse:collapse;font-family:var(--mono);font-size:12px;font-variant-numeric:tabular-nums;min-width:100%}
+.sheet th,.sheet td{border:1px solid var(--line);padding:4px 8px;white-space:nowrap}
+.sheet thead th{background:var(--panel-2);position:sticky;top:0}
+.sheet td.n{text-align:right}
+.sheet .rn{background:var(--panel-2);color:var(--faint);text-align:center}
+.sheet-name{display:inline-block;font-size:12px;padding:4px 10px;border:1px solid var(--line);border-top:0;border-radius:0 0 6px 6px;background:var(--panel);color:var(--muted);margin-bottom:12px}
+/* workbook */
+.wb{flex:1;overflow:auto;padding:14px 18px}
+.wb table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
+.wb th,.wb td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}
+.wb th{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:500}
+.wb tr.grp td{background:var(--panel-2);font-weight:600;font-family:var(--display)}
+.wb td.hint{color:var(--muted);font-size:12px;max-width:340px}
+.wb input{width:110px;padding:5px 7px;border:1px solid var(--line);border-radius:6px;background:var(--bg);text-align:right;font-family:var(--mono)}
+.wb input[readonly]{background:var(--panel-2);color:var(--muted)}
+.wb tr.locked td{color:var(--faint)}
+.st{font-family:var(--mono);font-size:11px;padding:2px 6px;border-radius:4px;white-space:nowrap}
+.st.ok{background:var(--good-soft);color:var(--good)}.st.close{background:var(--warn-soft);color:var(--warn)}.st.no{background:var(--bad-soft);color:var(--bad)}.st.pend{background:var(--panel-2);color:var(--faint)}
+.tot{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 14px}
+.tot div{background:var(--panel-2);border-radius:8px;padding:8px 12px;min-width:120px}
+.tot small{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.06em}
+.tot b{font-family:var(--display);font-size:18px;font-variant-numeric:tabular-nums}
+/* ef */
+.tools{display:flex;gap:8px;padding:10px 14px;border-bottom:1px solid var(--line);align-items:center;flex-wrap:wrap}
+.tools input{padding:6px 9px;border:1px solid var(--line);border-radius:6px;background:var(--bg);min-width:0;flex:1;max-width:320px}
+.ef{width:100%;border-collapse:collapse;font-size:12.5px;font-variant-numeric:tabular-nums}
+.ef th,.ef td{padding:6px 10px;border-bottom:1px solid var(--line);text-align:left}
+.ef th{position:sticky;top:0;background:var(--panel);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:500}
+.ef td.v{font-family:var(--mono);text-align:right;white-space:nowrap}
+.ef td.c{color:var(--muted);font-size:11.5px}
+/* calc */
+.calc{padding:16px;display:grid;gap:10px;align-content:start;max-width:520px;width:100%}
+.calc input{font-family:var(--mono);font-size:16px;padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--bg)}
+.calc .res{font-family:var(--display);font-size:26px;font-variant-numeric:tabular-nums}
+.calc .hist{font-family:var(--mono);font-size:12px;color:var(--muted);display:grid;gap:3px}
+.calc .hist button{border:0;background:none;text-align:left;color:var(--muted);padding:2px 0}
+/* chat */
+.chat{flex:1;overflow:auto;padding:14px 18px;display:flex;flex-direction:column;gap:10px}
+.msg{display:flex;gap:10px;max-width:640px}
+.msg .bubble{background:var(--panel-2);border-radius:10px;padding:8px 11px;line-height:1.45}
+.msg .bubble b{display:block;font-size:12px}
+.msg time{font-family:var(--mono);font-size:10.5px;color:var(--faint)}
+/* report */
+.rep{flex:1;overflow:auto;padding:16px 20px}
+.rep h3{font-family:var(--display);margin:0 0 6px;font-size:18px}
+.rep table{border-collapse:collapse;width:100%;max-width:820px;font-variant-numeric:tabular-nums;margin:10px 0 16px}
+.rep th,.rep td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left}
+.rep th{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:500;background:var(--panel-2)}
+.rep td.n{text-align:right;font-family:var(--mono)}
+.rep tr.sec td{font-weight:600;background:var(--panel-2)}
+.rep td.ind{padding-left:22px}
+.rep input,.rep select{padding:5px 7px;border:1px solid var(--line);border-radius:6px;background:var(--bg);font-family:var(--mono);width:110px;text-align:right}
+.rep select{width:auto;text-align:left;font-family:var(--font)}
+.empty{margin:auto;text-align:center;color:var(--muted);padding:30px;max-width:420px;line-height:1.5}
+/* toast */
+.toast{position:absolute;right:14px;bottom:78px;background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:8px;padding:10px 12px;box-shadow:0 10px 30px -10px rgba(0,0,0,.35);max-width:320px;font-size:12.5px;z-index:20;animation:slide .3s ease}
+@keyframes slide{from{transform:translateY(-8px);opacity:.3}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.toast{animation:none}}
+/* overlay */
+.ovl{position:absolute;inset:0;background:color-mix(in srgb,var(--bg) 92%,transparent);z-index:30;overflow:auto;padding:24px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;max-width:820px;margin:0 auto;padding:24px 28px}
+.card h2{font-family:var(--display);font-size:24px;margin:0 0 6px;text-wrap:balance}
+.card p{line-height:1.6;max-width:70ch}
+.lead{color:var(--muted)}
+.scores{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:16px 0}
+.scores div{background:var(--panel-2);border-radius:10px;padding:12px}
+.scores small{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.06em}
+.scores b{font-family:var(--display);font-size:26px}
+.opinion{border:2px solid var(--accent);border-radius:10px;padding:14px 16px;margin:14px 0}
+.opinion.q{border-color:var(--warn)}.opinion.a{border-color:var(--bad)}
+.opinion h4{margin:0 0 6px;font-family:var(--display)}
+.deb{border-top:1px solid var(--line);padding:10px 0;line-height:1.5}
+.deb .k{font-family:var(--mono);font-size:11px;color:var(--muted)}
+.pill{display:inline-block;font-family:var(--mono);font-size:11px;border-radius:4px;padding:1px 6px;margin-left:6px}
+.pill.best{background:var(--good-soft);color:var(--good)}.pill.ok{background:var(--warn-soft);color:var(--warn)}.pill.bad{background:var(--bad-soft);color:var(--bad)}
+.foot{font-size:12px;color:var(--muted);text-align:center;max-width:760px;line-height:1.5}
+.foot button{border:0;background:none;color:var(--accent-2);text-decoration:underline;padding:0}
+.mback{display:none}
+@media (max-width:820px){
+  body{padding-block:8px}
+  .lid{padding:6px;border-radius:12px}.cam{display:none}.base{display:none}
+  .os{height:calc(100dvh - 90px);min-height:520px}
+  .list{width:100%;border-right:0}
+  .tree{width:100%;border-right:0}
+  .winbody.split.showing .list,.winbody.split.showing .tree{display:none}
+  .winbody.split:not(.showing) .read,.winbody.split:not(.showing) .viewer{display:none}
+  .mback{display:inline-block;margin-bottom:10px}
+  .app{min-width:0;padding:4px 6px}
+  .dock{gap:2px;flex-wrap:nowrap}
+  .app span.l{display:none}
+  .kpi .bar{display:none}
+  .read{padding:14px}
+  .paper{padding:18px}
+  .wb td.hint{display:none}
+}
+</style>
+
+<div class="stage">
+  <div class="caption"><b>Carbon Desk</b> · learning simulation · case 01: technology</div>
+  <div class="laptop">
+    <div class="lid"><div class="cam"></div>
+      <div class="screen">
+        <div class="os" id="os">
+          <div class="topbar">
+            <span class="brand"><i></i>Veltara Systems</span>
+            <span class="clock" id="clock"></span>
+            <div class="kpis" id="kpis"></div>
+          </div>
+          <div class="desktop" id="desktop"></div>
+          <nav class="dock" id="dock" aria-label="Apps"></nav>
+        </div>
+      </div>
+    </div>
+    <div class="base"></div>
+  </div>
+  <p class="foot">Fictional company, people and data, built for training. Emission factors are rounded training values inspired by public databases (ADEME Base Empreinte, DEFRA, IEA). In a real inventory, cite the exact database and version. Progress is saved in this browser. <button id="restart">Restart the case</button></p>
+</div>
+
+<script>
+(function(){
+'use strict';
+/* ============ DATA ============ */
+const D = {
+  gasLyon:[68000,61000,47000,30000,16000,8000,6000,5000,11000,32000,54000,74000],
+  gasBerlin:54000, gen:1800, r410a:7.5,
+  fleetDiesel:[2480,2310,2140,2470], fleetPetrol:[1580,1490,1420,1610], adblue:320, evKwh:31000,
+  elec:{lyon:1180000, paris:210000, lisbon:160000, berlin:96000}, heatParis:95000,
+  kitsBought:24500, kitsSold:24000, kitMass:1.2, kitGeneric:18, kitVerified:15.2,
+  seaShare:0.75, seaKm:18500, airKm:9500, truckKm:1000, parcel:11.2,
+  services:{software:1200, consulting:1400, marketing:1600, catering:250, office:120},
+  cloudSpend:1860, cloudLoc:312.0, cloudMkt:18.4,
+  capex:{laptops:230, monitors:140, servers:24, fitout:850},
+  waste:{mixed:38, weee:2.4, paper:9},
+  travel:{short:1420000, long:2350000, train:610000, hotel:3900, car:85000},
+  staff:640, officeDays:2.2, weeks:46, oneWay:14, car:0.38, pt:0.42, homeDays:2.6,
+  kitW:2.5, life:7, sales:[['France',0.55,0.052],['Germany',0.20,0.380],['Spain',0.10,0.150],['Poland',0.08,0.700],['Netherlands',0.07,0.330]],
+  eol:0.6, bright:{share:0.20, s12:140}, revenue:92.4
+};
+const F = { // emission factors (kgCO2e per unit)
+  ng:0.184, ngW:0.039, dsl:2.51, dslW:0.61, pet:2.28, petW:0.56, r410a:2088, r32:675,
+  frL:0.052, deL:0.380, ptL:0.150, frR:0.058, deR:0.720, ptR:0.330, heat:0.110, heatW:0.020, frT:0.012, ptT:0.025, deT:0.060,
+  sea:0.008, air:1.10, truck:0.10,
+  software:120, consulting:100, marketing:200, catering:550, office:450, cloud:250,
+  laptop:250, monitor:300, server:1300, fitout:300,
+  mixed:470, weee:200, paper:20,
+  shortNo:0.153, shortRF:0.260, longNo:0.100, longRF:0.190, train:0.010, hotel:15, carKm:0.19, ptKm:0.03, home:1.2
+};
+const sum = a => a.reduce((s,x)=>s+x,0);
+const r2 = x => Math.round(x*100)/100;
+const t = kg => kg/1000;
+
+function keys(){
+  const dec = S.dec;
+  const gas = t((sum(D.gasLyon)+D.gasBerlin)*F.ng);
+  const k = {};
+  k.s1_gas = gas;
+  k.s1_gen = t(D.gen*F.dsl);
+  k.s1_fgas = t(D.r410a*F.r410a);
+  k.s1_fleet = t(sum(D.fleetDiesel)*F.dsl + sum(D.fleetPetrol)*F.pet);
+  k.s2_loc = t(D.elec.lyon*F.frL + D.elec.paris*F.frL + D.heatParis*F.heat + D.elec.lisbon*F.ptL + D.elec.berlin*F.deL);
+  const lyonMB = dec.d_goo==='b' ? 0 : D.elec.lyon*F.frR;
+  k.s2_mb = t(lyonMB + D.elec.paris*F.frR + D.heatParis*F.heat + 0 + D.elec.berlin*F.deR);
+  k.c1_kits = t(D.kitsBought*(dec.d_pcf==='a' ? D.kitVerified : D.kitGeneric));
+  k.c1_cloud = ({a:D.cloudMkt, b:D.cloudLoc, c:t(D.cloudSpend*F.cloud), d:0})[dec.d_cloud||'b'];
+  const sv = D.services; k.c1_services = t(sv.software*F.software+sv.consulting*F.consulting+sv.marketing*F.marketing+sv.catering*F.catering+sv.office*F.office);
+  const cx = D.capex; k.c2 = t(cx.laptops*F.laptop+cx.monitors*F.monitor+cx.servers*F.server+cx.fitout*F.fitout);
+  k.c3 = t((sum(D.gasLyon)+D.gasBerlin)*F.ngW + (D.gen+sum(D.fleetDiesel))*F.dslW + sum(D.fleetPetrol)*F.petW + (D.elec.lyon+D.elec.paris)*F.frT + D.elec.lisbon*F.ptT + D.elec.berlin*F.deT + D.heatParis*F.heatW);
+  const tons = D.kitsBought*D.kitMass/1000;
+  k.c4 = t(tons*D.seaShare*D.seaKm*F.sea + tons*(1-D.seaShare)*D.airKm*F.air + tons*D.truckKm*F.truck) + D.parcel;
+  k.c5 = t(D.waste.mixed*F.mixed + D.waste.weee*F.weee + D.waste.paper*F.paper);
+  const tr = D.travel, rf = dec.d_rf==='b';
+  k.c6 = t(tr.short*(rf?F.shortRF:F.shortNo) + tr.long*(rf?F.longRF:F.longNo) + tr.train*F.train + tr.hotel*F.hotel + tr.car*F.carKm);
+  const km = D.staff*2*D.oneWay*D.officeDays*D.weeks;
+  k.c7 = t(km*(D.car*F.carKm + D.pt*F.ptKm)) + (dec.d_tele==='a' ? t(D.staff*D.homeDays*D.weeks*F.home) : 0);
+  const grid = sum(D.sales.map(s=>s[1]*s[2]));
+  k.c11 = dec.d_cat11==='a' ? 0 : t(D.kitsSold*D.kitW*8760*D.life/1000*grid);
+  k.c12 = dec.d_cat11==='a' ? 0 : t(D.kitsSold*D.eol);
+  k.c15 = D.bright.share*D.bright.s12;
+  return k;
+}
+
+const LINES = [
+  {g:'Scope 1 · direct emissions', id:'s1_gas', label:'Natural gas: Lyon HQ + Berlin', hint:'kWh (HHV) × combustion factor', m:4},
+  {g:'Scope 1 · direct emissions', id:'s1_gen', label:'Backup generator diesel', hint:'litres × combustion factor', m:4},
+  {g:'Scope 1 · direct emissions', id:'s1_fgas', label:'Refrigerant leaks (F-gas)', hint:'kg recharged × GWP', m:4},
+  {g:'Scope 1 · direct emissions', id:'s1_fleet', label:'Company car fleet fuel', hint:'litres by fuel × combustion factor', m:4},
+  {g:'Scope 2 · purchased energy', id:'s2_loc', label:'Electricity + heat, location-based', hint:'kWh per site × grid average factor', m:5},
+  {g:'Scope 2 · purchased energy', id:'s2_mb', label:'Electricity + heat, market-based', hint:'contract instruments, else residual mix', m:5},
+  {g:'Scope 3 · upstream', id:'c1_kits', label:'Cat. 1 · Sensor kits purchased', hint:'units purchased × product footprint', m:7},
+  {g:'Scope 3 · upstream', id:'c1_cloud', label:'Cat. 1 · Cloud hosting', hint:'set by your decision on the cloud data', m:6, auto:true},
+  {g:'Scope 3 · upstream', id:'c1_services', label:'Cat. 1 · Purchased services', hint:'k€ spend × spend-based factor (only lines not counted elsewhere)', m:7},
+  {g:'Scope 3 · upstream', id:'c2', label:'Cat. 2 · Capital goods', hint:'assets acquired in 2025 × cradle-to-gate factor', m:7},
+  {g:'Scope 3 · upstream', id:'c3', label:'Cat. 3 · Fuel- and energy-related', hint:'upstream (WTT) of fuels + upstream/T&D of electricity & heat', m:5},
+  {g:'Scope 3 · upstream', id:'c4', label:'Cat. 4 · Upstream transport', hint:'t × km × mode factor, + carrier report', m:8},
+  {g:'Scope 3 · upstream', id:'c5', label:'Cat. 5 · Waste', hint:'tonnes × treatment factor', m:4},
+  {g:'Scope 3 · upstream', id:'c6', label:'Cat. 6 · Business travel', hint:'pkm / nights / km × factor', m:9},
+  {g:'Scope 3 · upstream', id:'c7', label:'Cat. 7 · Employee commuting', hint:'staff × km × modal split × factor', m:9},
+  {g:'Scope 3 · downstream', id:'c11', label:'Cat. 11 · Use of sold products', hint:'units sold × lifetime kWh × sales-weighted grid', m:10},
+  {g:'Scope 3 · downstream', id:'c12', label:'Cat. 12 · End of life of sold products', hint:'units sold × end-of-life factor', m:10},
+  {g:'Scope 3 · downstream', id:'c15', label:'Cat. 15 · Investments', hint:'equity share × investee Scope 1+2', m:7}
+];
+
+const EFLIB = [
+  ['Fuels','Natural gas, combustion (Scope 1)','kgCO2e/kWh HHV',F.ng],
+  ['Fuels','Natural gas, upstream (WTT, Cat. 3)','kgCO2e/kWh HHV',F.ngW],
+  ['Fuels','Diesel (road / generator), combustion','kgCO2e/litre',F.dsl],
+  ['Fuels','Diesel, upstream (WTT)','kgCO2e/litre',F.dslW],
+  ['Fuels','Petrol, combustion','kgCO2e/litre',F.pet],
+  ['Fuels','Petrol, upstream (WTT)','kgCO2e/litre',F.petW],
+  ['Fuels','AdBlue (urea solution)','not a fuel: no combustion CO2 to report','—'],
+  ['Refrigerants','R-410A, GWP 100-yr (IPCC AR5)','kgCO2e/kg',F.r410a],
+  ['Refrigerants','R-32, GWP 100-yr (IPCC AR5)','kgCO2e/kg',F.r32],
+  ['Electricity','France, grid average (location)','kgCO2e/kWh',F.frL],
+  ['Electricity','Germany, grid average (location)','kgCO2e/kWh',F.deL],
+  ['Electricity','Portugal, grid average (location)','kgCO2e/kWh',F.ptL],
+  ['Electricity','Spain, grid average (location)','kgCO2e/kWh',0.150],
+  ['Electricity','Poland, grid average (location)','kgCO2e/kWh',0.700],
+  ['Electricity','Netherlands, grid average (location)','kgCO2e/kWh',0.330],
+  ['Electricity','France, residual mix (market)','kgCO2e/kWh',F.frR],
+  ['Electricity','Germany, residual mix (market)','kgCO2e/kWh',F.deR],
+  ['Electricity','Portugal, residual mix (market)','kgCO2e/kWh',F.ptR],
+  ['Electricity','Renewable with Guarantees of Origin (market)','kgCO2e/kWh',0],
+  ['Electricity','France, upstream + T&D losses (Cat. 3)','kgCO2e/kWh',F.frT],
+  ['Electricity','Portugal, upstream + T&D losses (Cat. 3)','kgCO2e/kWh',F.ptT],
+  ['Electricity','Germany, upstream + T&D losses (Cat. 3)','kgCO2e/kWh',F.deT],
+  ['Heat','District heating Paris network (location & market)','kgCO2e/kWh',F.heat],
+  ['Heat','District heating, upstream (Cat. 3)','kgCO2e/kWh',F.heatW],
+  ['Freight','Container ship, Asia–Europe','kgCO2e/t·km',F.sea],
+  ['Freight','Air freight, long-haul','kgCO2e/t·km',F.air],
+  ['Freight','Articulated truck, 40 t, average load','kgCO2e/t·km',F.truck],
+  ['Spend-based','Software & SaaS subscriptions','kgCO2e/k€',F.software],
+  ['Spend-based','Consulting, legal, audit','kgCO2e/k€',F.consulting],
+  ['Spend-based','Marketing, advertising, events','kgCO2e/k€',F.marketing],
+  ['Spend-based','Catering & food services','kgCO2e/k€',F.catering],
+  ['Spend-based','Office supplies & small equipment','kgCO2e/k€',F.office],
+  ['Spend-based','Cloud / data-centre services','kgCO2e/k€',F.cloud],
+  ['Spend-based','Office fit-out & building works','kgCO2e/k€',F.fitout],
+  ['Products','Laptop, cradle-to-gate','kgCO2e/unit',F.laptop],
+  ['Products','Monitor 27", cradle-to-gate','kgCO2e/unit',F.monitor],
+  ['Products','Rack server, cradle-to-gate','kgCO2e/unit',F.server],
+  ['Waste','Mixed office waste, incineration/landfill mix','kgCO2e/t',F.mixed],
+  ['Waste','WEEE, recycling','kgCO2e/t',F.weee],
+  ['Waste','Paper & cardboard, recycling','kgCO2e/t',F.paper],
+  ['Travel','Flight short-haul economy, without RF','kgCO2e/pkm',F.shortNo],
+  ['Travel','Flight short-haul economy, with RF (non-CO2)','kgCO2e/pkm',F.shortRF],
+  ['Travel','Flight long-haul economy, without RF','kgCO2e/pkm',F.longNo],
+  ['Travel','Flight long-haul economy, with RF (non-CO2)','kgCO2e/pkm',F.longRF],
+  ['Travel','Train, France/EU mix','kgCO2e/pkm',F.train],
+  ['Travel','Hotel night, Europe average','kgCO2e/night',F.hotel],
+  ['Travel','Car, average fuel (rental/taxi/commuting)','kgCO2e/km',F.carKm],
+  ['Travel','Public transport, urban mix','kgCO2e/pkm',F.ptKm],
+  ['Travel','Teleworking day (home heating + IT)','kgCO2e/day',F.home]
+];
+
+/* ============ PEOPLE ============ */
+const P = {
+  ceo:{n:'Claire Dumont',r:'CEO, Veltara Systems',c:'#3d5a80',e:'claire.dumont@veltara.example'},
+  cfo:{n:'Hugo Marchetti',r:'CFO',c:'#7a4f9e',e:'hugo.marchetti@veltara.example'},
+  aud:{n:'Ines Bauer',r:'Senior Manager, Sustainability Assurance · Kessler & Partners',c:'#5b6b2f',e:'i.bauer@kessler-partners.example'},
+  fac:{n:'Marc Olivier',r:'Facilities Manager, Lyon',c:'#a0522d',e:'marc.olivier@veltara.example'},
+  brk:{n:'Nadia Ferrand',r:'Account Manager · VoltaBroker',c:'#b8860b',e:'nadia@voltabroker.example'},
+  cto:{n:'Tomás Silva',r:'CTO',c:'#2e7d6b',e:'tomas.silva@veltara.example'},
+  pro:{n:'Sofia Reyes',r:'Head of Procurement',c:'#9b2f5c',e:'sofia.reyes@veltara.example'},
+  fin:{n:'Marion Leclerc',r:'Group Controller',c:'#47637a',e:'marion.leclerc@veltara.example'},
+  sc:{n:'Lena Hoffmann',r:'Supply Chain Lead',c:'#6a5acd',e:'lena.hoffmann@veltara.example'},
+  hr:{n:'Julie Martin',r:'HR Director',c:'#c0392b',e:'julie.martin@veltara.example'},
+  cmo:{n:'Antoine Roux',r:'CMO',c:'#d35400',e:'antoine.roux@veltara.example'},
+  pm:{n:'Yara Benali',r:'Product Manager, VelSense',c:'#16803c',e:'yara.benali@veltara.example'}
+};
+const ini = n => n.split(' ').map(w=>w[0]).join('').slice(0,2);
+
+/* ============ FILE RENDERERS ============ */
+const fmt = (x,d=0) => Number(x).toLocaleString('en-GB',{minimumFractionDigits:d,maximumFractionDigits:d});
+function paper(logo, title, metaL, metaR, body){
+  return `<div class="paper"><div class="meta"><div><div class="logo">${logo}</div>${metaL}</div><div style="text-align:right">${metaR}</div></div><h3>${title}</h3>${body}</div>`;
+}
+function tbl(head, rows, numCols=[]){
+  return `<table><thead><tr>${head.map((h,i)=>`<th class="${numCols.includes(i)?'n':''}">${h}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map((c,i)=>`<td class="${numCols.includes(i)?'n':''}">${c}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+}
+function sheet(name, head, rows, numCols=[]){
+  return `<div class="sheet"><table><thead><tr><th class="rn"></th>${head.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.map((r,ri)=>`<tr><td class="rn">${ri+2}</td>${r.map((c,i)=>`<td class="${numCols.includes(i)?'n':''}">${c}</td>`).join('')}</tr>`).join('')}</tbody></table></div><span class="sheet-name">${name}</span>`;
+}
+const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+const FILES = [
+ {id:'f_ghg',folder:'Sustainability',name:'GHG Protocol quick guide.pdf',m:1,render:()=>paper('Carbon Desk · Learning note','GHG Protocol in one page','Internal training note','v1 · 2026',
+   `<p><b>Three scopes.</b> Scope 1: direct emissions from sources the company owns or controls (fuel burned, refrigerant leaks). Scope 2: purchased electricity, heat, steam, cooling. Scope 3: the 15 categories of other indirect emissions, upstream (1–8) and downstream (9–15).</p>
+   <p><b>Five principles.</b> Relevance, completeness, consistency, transparency, accuracy. An auditor tests each one.</p>
+   <p><b>Boundaries.</b> Choose one consolidation approach (equity share, financial control or operational control) and apply it to every entity. Then define operational boundaries: which scopes and categories.</p>
+   <p><b>Scope 2 dual reporting.</b> Report both location-based (grid average) and market-based (contracts, certificates, else residual mix).</p>
+   <p><b>Scope 3.</b> Screen all 15 categories. Exclusions must be justified. Capital goods are counted 100% in the year acquired, not depreciated.</p>
+   <p><b>What stays outside the totals.</b> Avoided emissions, carbon credits/offsets, biogenic CO2 (reported separately).</p>
+   <div class="note">CSRD link: ESRS E1-6 asks for gross Scope 1, Scope 2 (location and market), significant Scope 3 categories, total GHG emissions and GHG intensity per net revenue.</div>`)},
+ {id:'f_org',folder:'Finance',name:'Group structure 2025.pdf',m:2,render:()=>paper('VELTARA SYSTEMS','Group legal structure at 31 Dec 2025','Prepared by: Group Controlling','Consolidated financial statements FY2025',
+   tbl(['Entity','Country','Ownership','Accounting treatment','Who runs operations'],[
+     ['Veltara Systems SAS (parent): HQ, owned building','France · Lyon','—','Parent','Veltara'],
+     ['Veltara Systems SAS: Paris office (leased, 1,100 m²)','France · Paris','Lease','Right-of-use asset','Veltara (own meter, own staff, fit-out)'],
+     ['Veltara Portugal Lda: dev centre','Portugal · Lisbon','100%','Full consolidation','Veltara'],
+     ['Kodaly Labs GmbH: R&D (acquired 2023)','Germany · Berlin','70%','Full consolidation (30% minority)','Veltara management'],
+     ['Brightcell SAS: battery-analytics start-up','France · Nantes','20%','Equity method (associate)','Brightcell founders']]) +
+   `<p>Headcount 31/12/2025: 640 (Lyon 360, Paris 120, Lisbon 120, Berlin 40). Net revenue FY2025: €${D.revenue}M (SaaS €78.0M, VelSense hardware kits €14.4M).</p>`)},
+ {id:'f_board',folder:'Board',name:'Board memo: CSRD readiness.pdf',m:1,render:()=>paper('VELTARA SYSTEMS','Board memo: first sustainability statement','From: CFO · To: Board of Directors','Confidential',
+   `<p>The Board decided on 9 December 2025 to publish an ESRS-based sustainability statement for FY2025. The EU simplification package (Omnibus) changed the timetable and thresholds, so the legal obligation for a company of our size is still being confirmed by counsel. The decision stands for three reasons:</p>
+   <ul><li>Our bank's sustainability-linked loan (€25M) requires a verified GHG baseline by 30 June 2026.</li><li>Two key enterprise clients ask for our Scope 1, 2 and 3 data in their supplier questionnaires.</li><li>Our auditor Kessler & Partners will give a limited assurance conclusion on the climate section.</li></ul>
+   <p><b>Deadlines.</b> Draft climate figures to the auditor: 27 February 2026. Board approval: 13 March 2026.</p>
+   <div class="note">Materiality assessment (double materiality) concluded that climate change (E1) is material. This mission covers E1-6 GHG emissions only.</div>`)},
+ {id:'f_old',folder:'Board',name:'Consultant estimate FY2024.xlsx',m:1,render:()=>`<p class="lead" style="margin:0 0 8px">Last year's quick estimate, made by an external consultant in two days.</p>`+sheet('Estimate',['Item','Spend k€','Factor kgCO2e/k€','tCO2e'],[
+   ['All purchases (ledger total)','24,600','80','1,968'],['Energy bills','410','300','123'],['Travel','1,050','<i>included above</i>',''],['<b>Total</b>','','','<b>2,091</b>']],[1,2,3])+`<p class="lead" style="margin-top:8px;font-size:12.5px">Cell D5 comment: "Spend-based only. No Scope 1/2 split. Sold products not covered."</p>`},
+ {id:'f_gas_lyon',folder:'Facilities',name:'Gas invoices Lyon 2025.pdf',m:4,render:()=>paper('GazNet Énergies','Annual consumption statement · natural gas','Customer: Veltara Systems SAS · 12 rue des Canuts, 69004 Lyon<br>PCE 21 4587 1123 0098','Contract: Gaz Pro Indexé<br>Period: 01/01/2025 – 31/12/2025',
+   tbl(['Month','Index start','Index end','Volume m³','Conversion coef.','Energy kWh (HHV/PCS)','Amount € excl. VAT'],
+     D.gasLyon.map((v,i)=>{const m3=Math.round(v/11.2);return [MONTHS[i]+' 2025',fmt(10000+i*500),fmt(10000+i*500+m3),fmt(m3),'11.20',fmt(v),fmt(v*0.071,2)];}).concat([['<b>Total</b>','','','','','<b>'+fmt(sum(D.gasLyon))+'</b>','<b>'+fmt(sum(D.gasLyon)*0.071,2)+'</b>']]),[3,4,5,6])+
+   `<p class="fine">Energy is billed in kWh PCS (higher heating value). Emission factors in the Carbon Desk library are expressed per kWh HHV.</p>`)},
+ {id:'f_gas_berlin',folder:'Facilities',name:'Gasrechnung Kodaly Labs 2025.pdf',m:4,render:()=>paper('Spree Gasversorgung GmbH','Jahresabrechnung Erdgas 2025','Kodaly Labs GmbH · Torstraße 140, 10119 Berlin<br>Zählernummer 7GZ-0049213','Abrechnungszeitraum 01.01.2025 – 31.12.2025',
+   tbl(['Position','Menge','Einheit','Betrag €'],[['Verbrauch (Brennwert / HHV)',fmt(D.gasBerlin),'kWh',fmt(D.gasBerlin*0.098,2)],['Grundpreis','12','Monate','264.00'],['CO2-Preis (BEHG)','','','included'],['<b>Summe</b>','','','<b>'+fmt(D.gasBerlin*0.098+264,2)+'</b>']],[1,3])+
+   `<p class="fine">Verbrauch = consumption. Brennwert = higher heating value (HHV/PCS).</p>`)},
+ {id:'f_gen',folder:'Facilities',name:'Generator log 2025.xlsx',m:4,render:()=>sheet('Genset G1 · server room',['Date','Event','Run hours','Diesel delivered (L)','Tank level after (L)'],[
+   ['12/01/2025','Delivery','','600','1,150'],['Jan–Jun','Monthly load tests (6)','9.0','',''],['18/07/2025','Grid outage, Lyon 4e','9.2','',''],['22/07/2025','Delivery','','600','1,120'],['Jul–Dec','Monthly load tests (6)','9.0','',''],['04/11/2025','Delivery','','600','1,140'],['<b>Total</b>','','<b>27.2</b>','<b>1,800</b>','']],[2,3,4])+`<p class="lead" style="font-size:12.5px;margin-top:8px">Tank level is roughly stable year on year: deliveries ≈ consumption.</p>`},
+ {id:'f_fgas',folder:'Facilities',name:'F-gas intervention report.pdf',m:4,render:()=>paper('FroidTech Services','Fiche d\'intervention: fluid handling','Operator: FroidTech Services, certificate cat. I no. FT-0457<br>Site: Veltara HQ, server room','Intervention no. 2025-0931 · 14/08/2025',
+   tbl(['Equipment','Fluid','Charge (kg)','Leak found','Fluid added (kg)','Fluid recovered (kg)'],[['CRAC unit #2 (server room)','R-410A','24.0','Yes, brazed joint, repaired',String(D.r410a),'0'],['Split unit, meeting room 3','R-32','1.8','No (annual check)','0','0'],['CRAC unit #1 (server room)','R-410A','24.0','No (annual check)','0','0']],[2,4,5])+
+   `<p class="fine">Fluid added after a leak equals the quantity emitted to the atmosphere (mass-balance approach).</p><span class="stamp">SIGNED · FROIDTECH</span>`)},
+ {id:'f_fleet',folder:'Finance',name:'Fuel card export 2025.csv',m:4,render:()=>sheet('fuelcards_2025.csv',['Quarter','Product','Volume (L)','Amount € incl. VAT','Vehicles'],[
+   ...D.fleetDiesel.map((v,i)=>['Q'+(i+1),'Diesel B7',fmt(v),fmt(v*1.72,2),'12 diesel cars']),
+   ...D.fleetPetrol.map((v,i)=>['Q'+(i+1),'Petrol SP95-E10',fmt(v),fmt(v*1.84,2),'7 petrol cars']),
+   ['Q1–Q4','AdBlue',fmt(D.adblue),fmt(D.adblue*0.9,2),'diesel cars'],['Q1–Q4','Car wash / tolls','—','4,812.40','all']],[2,3])+`<p class="lead" style="font-size:12.5px;margin-top:8px">The fleet also has 3 electric cars. They are charged at the Lyon car park.</p>`},
+ {id:'f_waste',folder:'Facilities',name:'Waste register 2025.xlsx',m:4,render:()=>sheet('Registre déchets',['Waste stream','Treatment','Tonnes 2025','Collector'],[
+   ['Mixed office waste (DIB)','Incineration / landfill mix',fmt(D.waste.mixed,1),'Métropole collection'],['WEEE (old IT, screens)','Recycling (certified)',fmt(D.waste.weee,1),'EcoTechRecycle'],['Paper & cardboard','Recycling',fmt(D.waste.paper,1),'PaperLoop']],[2])},
+ {id:'f_elec',folder:'Facilities',name:'Electricity bills: all sites.pdf',m:5,render:()=>paper('Group Facilities','Electricity consumption summary 2025','Compiled from supplier invoices','All sites · FY2025',
+   tbl(['Site','Supplier / contract','Meter','kWh 2025','Notes'],[
+     ['Lyon HQ','ÉlecPro · "Pro Classique" (standard)','PDL 3018 7712 4401',fmt(D.elec.lyon),'incl. server room sub-meter 640,000 kWh and EV chargers sub-meter '+fmt(D.evKwh)+' kWh'],
+     ['Paris office','ÉlecPro · "Pro Classique" (standard)','PDL 3009 2291 0815',fmt(D.elec.paris),'tenant meter in Veltara\'s name'],
+     ['Lisbon dev centre','LusoVerde · "100% Renovável"','CPE PT0002 0001 77',fmt(D.elec.lisbon),'Guarantees of Origin cancelled by supplier, see contract'],
+     ['Berlin, Kodaly Labs','Spree Strom · "Gewerbe Basis"','Zähler 1ESY-2231',fmt(D.elec.berlin),'standard contract']],[3])+
+   `<p class="fine">Paris heating is supplied by the city district heating network, billed separately (see Paris heating statement).</p>`)},
+ {id:'f_contracts',folder:'Legal',name:'Energy supply contracts: extracts.pdf',m:5,render:()=>paper('Legal · contract extracts','Electricity contracts: environmental clauses','Extracts for GHG reporting','Reviewed by Legal 06/01/2026',
+   `<p><b>ÉlecPro "Pro Classique" (Lyon, Paris).</b> Art. 7: "The supplier makes no commitment on the origin of the electricity supplied. No Guarantees of Origin are attached to this contract."</p>
+    <p><b>LusoVerde "100% Renovável" (Lisbon).</b> Cl. 4.2: "The supplier cancels Guarantees of Origin from Portuguese renewable plants equal to 100% of the customer's consumption, same calendar year, in the national GO registry, on behalf of the customer." Certificate ref. LV-GO-2025-11873 attached.</p>
+    <p><b>Spree Strom "Gewerbe Basis" (Berlin).</b> § 9: standard supplier mix; no Herkunftsnachweise assigned to the customer.</p>`)},
+ {id:'f_heat',folder:'Facilities',name:'Paris district heating statement.pdf',m:5,render:()=>paper('Paris Urban Heat','Annual heat delivery statement 2025','Customer: Veltara Systems SAS · Paris office','Substation SST-11-0427',
+   tbl(['Period','Heat delivered (kWh)','Network emission factor'],[['Jan–Apr 2025',fmt(52000),''],['Oct–Dec 2025',fmt(43000),''],['<b>Total</b>','<b>'+fmt(D.heatParis)+'</b>','0.110 kgCO2e/kWh (network-specific, used for both methods)']],[1]))},
+ {id:'f_broker',folder:'Inbox attachments',name:'GoO offer: VoltaBroker.pdf',m:5,render:()=>paper('VoltaBroker','Offer: Guarantees of Origin 2025 vintage','Prepared for Veltara Systems','Valid until 20/02/2026',
+   tbl(['Product','Volume','Price','Total'],[['European wind GoOs, 2025 vintage, unbundled','1,180 MWh','€2.00/MWh','€2,360.00']],[1,2,3])+`<p>"Make your Lyon electricity <b>zero-carbon in your 2025 report</b> in one click. Certificates cancelled on your behalf within 5 working days."</p><p class="fine">Origin: Nordic/Baltic wind, no new capacity guaranteed. Cancellation in the AIB hub, same reporting year.</p>`)},
+ {id:'f_cloud',folder:'IT',name:'Stratocloud carbon export 2025.csv',m:6,render:()=>sheet('stratocloud_ccf_2025.csv',['Service','Region','Usage share','Location-based tCO2e','Market-based tCO2e'],[
+   ['Compute','eu-west (Paris)','46%','71.2','4.1'],['Compute','eu-central (Frankfurt)','31%','168.4','9.8'],['Storage','eu-central','14%','52.7','3.0'],['Network & other','multi','9%','19.7','1.5'],['<b>Total</b>','','100%','<b>'+fmt(D.cloudLoc,1)+'</b>','<b>'+fmt(D.cloudMkt,1)+'</b>']],[2,3,4])+
+   `<p class="lead" style="font-size:12.5px;margin-top:8px">Provider note: "Market-based figures reflect our renewable energy purchases (PPAs and certificates) allocated to customers. Covers electricity of the data centres, plus a share of hardware manufacturing. Annual spend in 2025: €${fmt(D.cloudSpend)}k."</p>`},
+ {id:'f_ledger',folder:'Procurement',name:'Spend ledger FY2025.xlsx',m:7,render:()=>sheet('GL by purchase category',['GL account','Category','Spend k€ excl. VAT','Covered elsewhere?'],[
+   ['6061','Electricity (all sites)','298','?'],['6061','Natural gas','36','?'],['6062','District heating Paris','11','?'],
+   ['6064','Office supplies & small equipment',fmt(D.services.office),'?'],['6156','Software & SaaS subscriptions',fmt(D.services.software),'?'],
+   ['6132','Cloud hosting: Stratocloud',fmt(D.cloudSpend),'?'],['6226','Consulting, legal, audit fees',fmt(D.services.consulting),'?'],
+   ['6231','Marketing, advertising, events',fmt(D.services.marketing),'?'],['6257','Catering & staff restaurant (Lyon)',fmt(D.services.catering),'?'],
+   ['6251','Travel agency (flights, trains, hotels)','1,150','?'],['6071','VelSense kits purchased for resale','6,860','?'],
+   ['2183','IT equipment (capitalised)','262','?'],['2135','Lisbon office fit-out (capitalised)',fmt(D.capex.fitout),'?'],
+   ['6111','Contract engineering (Kodaly sub-contractors)','<i>in consulting</i>','?']],[2])+`<p class="lead" style="font-size:12.5px;margin-top:8px">Column D is for you to fill in your working file. Spend-based factors are in the EF library.</p>`},
+ {id:'f_cap',folder:'Finance',name:'Capitalisation policy.pdf',m:7,render:()=>paper('VELTARA SYSTEMS','Group accounting policy: tangible assets','Group Controlling','Policy GC-07 · rev. 2024',
+   `<p>Items with a unit cost above <b>€500 excl. VAT</b> and a useful life above one year are capitalised. Depreciation: laptops and monitors 3 years, servers 5 years, fit-out 10 years (straight line).</p><p>Items below €500 are expensed as "office supplies & small equipment".</p>`)},
+ {id:'f_assets',folder:'Finance',name:'Fixed asset additions 2025.xlsx',m:7,render:()=>sheet('Additions FY2025',['Asset class','Units','Acquisition value k€','Depreciation 2025 k€','Site'],[
+   ['Laptops',fmt(D.capex.laptops),'322','107','all'],['Monitors 27"',fmt(D.capex.monitors),'49','16','all'],['Rack servers (on-prem)',fmt(D.capex.servers),'168','34','Lyon'],['Office fit-out','1 project',fmt(D.capex.fitout),'85','Lisbon']],[1,2,3])},
+ {id:'f_kitpcf',folder:'Procurement',name:'Sensor kit supplier datasheet.pdf',m:7,render:()=>paper('Formosa IoT Manufacturing Co.','VelSense kit (OEM): environmental datasheet','Supplier code FIM-VS-200','Issued 03/2025',
+   tbl(['Item','Value'],[['Kit content','1 gateway + 4 sensors + PSU + packaging'],['Shipping mass','1.2 kg per kit'],['Carbon footprint, cradle-to-gate','18 kgCO2e per kit (estimate, secondary data, not verified)'],['Origin','Taoyuan, Taiwan']])+
+   `<p class="fine">A product carbon footprint (PCF) to ISO 14067, with third-party verification, can be provided on request (lead time about 3 weeks).</p>`)},
+ {id:'f_kitpcf2',folder:'Procurement',name:'Verified PCF: VelSense kit.pdf',m:99,render:()=>paper('Formosa IoT Manufacturing Co.','Product Carbon Footprint: VelSense kit','ISO 14067:2018 · cradle-to-gate','Verified by TÜV-style body, statement no. PCF-25-4471',
+   tbl(['Life-cycle stage','kgCO2e/kit'],[['Electronics (PCBA, chips)','10.1'],['Housings & PSU','3.4'],['Assembly (Taiwan grid)','1.2'],['Packaging','0.5'],['<b>Total cradle-to-gate</b>','<b>'+fmt(D.kitVerified,1)+'</b>']],[1])+`<span class="stamp">VERIFIED</span>`)},
+ {id:'f_bright',folder:'Finance',name:'Brightcell investee data.pdf',m:7,render:()=>paper('Brightcell SAS','Investor information pack 2025 (extract)','To shareholders','Unaudited',
+   `<p>Brightcell's own GHG inventory (operational control): Scope 1 = 22 tCO2e, Scope 2 (location) = 118 tCO2e, <b>Scope 1+2 = ${D.bright.s12} tCO2e</b>. Scope 3 not calculated.</p><p>Veltara holds 20% of the shares and one board seat out of five.</p>`)},
+ {id:'f_ship',folder:'Supply chain',name:'Inbound shipments 2025.xlsx',m:8,render:()=>sheet('Inbound VelSense',['Lane','Mode','Share of kits','Distance (km)','Paid by'],[
+   ['Kaohsiung → Rotterdam','Container ship','75%',fmt(D.seaKm),'Veltara (FOB)'],['Taipei → Frankfurt','Air freight (port strike, Q4 restock)','25%',fmt(D.airKm),'Veltara (FOB)'],['Rotterdam / Frankfurt → Lyon warehouse','Truck 40 t','100%',fmt(D.truckKm),'Veltara'],['<b>Kits received 2025</b>','','<b>'+fmt(D.kitsBought)+'</b>','','']],[2,3])+`<p class="lead" style="font-size:12.5px;margin-top:8px">Shipping mass per kit: see supplier datasheet.</p>`},
+ {id:'f_parcel',folder:'Supply chain',name:'Parcel carrier GHG report.pdf',m:8,render:()=>paper('EuroParcel Logistics','Customer emissions report 2025','GLEC Framework v3 · ISO 14083','Account VLT-0021',
+   `<p>Deliveries from the Lyon warehouse to Veltara customers (Europe), paid by Veltara: 24,000 kits, 6,912 parcels.</p>`+tbl(['Indicator','Value'],[['Well-to-wheel emissions','<b>'+fmt(D.parcel,1)+' tCO2e</b>'],['Intensity','0.39 kgCO2e/parcel']])) },
+ {id:'f_travel',folder:'HR',name:'Travel agency annual report.pdf',m:9,render:()=>paper('Wayfare Business Travel','Annual travel report 2025','Client: Veltara Systems (all entities)','Data extract 15/01/2026',
+   tbl(['Segment','Activity','Unit'],[['Flights short-haul (< 3,700 km), economy',fmt(D.travel.short),'passenger·km'],['Flights long-haul, economy',fmt(D.travel.long),'passenger·km'],['Rail (France & EU)',fmt(D.travel.train),'passenger·km'],['Hotel nights',fmt(D.travel.hotel),'nights'],['Rental cars & taxis',fmt(D.travel.car),'km']],[1])+
+   `<div class="note">Our emissions figures include radiative forcing (RF) for non-CO2 effects of aviation at high altitude. Ask us for a "CO2e without RF" split.</div>`)},
+ {id:'f_survey',folder:'HR',name:'Commuting survey 2025.xlsx',m:9,render:()=>sheet('Results (extrapolated to 640 staff)',['Indicator','Value'],[
+   ['Responses','455 / 640 (71%)'],['Average one-way distance','14 km'],['Office days per week (average)','2.2'],['Teleworking days per week (average)','2.6'],['Working weeks per year','46'],['Main mode: car (solo, average fuel)','38%'],['Main mode: public transport','42%'],['Main mode: bike / walk','20%']])},
+ {id:'f_tele',folder:'HR',name:'Telework policy.pdf',m:9,render:()=>paper('VELTARA SYSTEMS','Hybrid work policy','HR · effective 01/2024','',
+   `<p>Employees may work from home up to 3 days per week. Average observed: 2.6 days. A monthly allowance of €30 covers home energy and equipment.</p>`)},
+ {id:'f_product',folder:'Product',name:'VelSense kit datasheet.pdf',m:10,render:()=>paper('VelSense by Veltara','Technical datasheet: VelSense building kit','Building-energy monitoring','Rev. C · 2025',
+   tbl(['Parameter','Value'],[['Average power, always on (gateway + 4 sensors)',D.kitW+' W'],['Operating hours','8,760 h/year (24/7)'],['Expected service life','7 years'],['End of life','WEEE take-back via distributors, average treatment 0.6 kgCO2e/kit'],['Units sold 2025',fmt(D.kitsSold)]])+
+   `<p class="fine">The SaaS dashboards run on Stratocloud (already in purchased services) and are viewed on customers' own devices.</p>`)},
+ {id:'f_sales',folder:'Product',name:'Kit sales by country.xlsx',m:10,render:()=>sheet('Sales 2025',['Country','Share of units','Grid factor kgCO2e/kWh'],D.sales.map(s=>[s[0],Math.round(s[1]*100)+'%',s[2].toFixed(3)]),[1,2])},
+ {id:'f_offset',folder:'Inbox attachments',name:'Offset offer: ClimaFix.pdf',m:10,render:()=>paper('ClimaFix Credits','Become carbon neutral in 2025!','Prepared for Antoine Roux','',
+   `<p>4,000 avoidance credits (cookstoves, 2019 vintage) at €4.50 = <b>€18,000</b>. "Use our CARBON NEUTRAL COMPANY label on your website, product packaging and your annual report."</p>`)},
+ {id:'f_esrs',folder:'Legal',name:'ESRS E1-6 cheat sheet.pdf',m:11,render:()=>paper('Legal & Sustainability','ESRS E1-6: what goes in the table','Internal guidance','',
+   `<ul><li>Gross Scope 1, with % from regulated emission trading schemes.</li><li>Gross Scope 2, location-based and market-based.</li><li>Gross Scope 3, total and by significant category.</li><li>Total GHG emissions, location-based and market-based.</li><li>GHG intensity per net revenue (tCO2e per € million), both methods.</li><li>Base year and comparative year (first report: comparatives can be omitted).</li><li>Carbon credits and removals are reported in E1-7, never netted from E1-6.</li></ul>`)}
+];
+
+/* ============ MISSIONS ============ */
+const ref = s => `<span class="ref">${s}</span>`;
+const MISSIONS = [
+ null,
+ {n:1, from:'ceo', time:'Mon 05 Jan 09:12', subj:'Welcome aboard: our first carbon footprint', files:['f_board','f_old','f_ghg'], cost:0,
+  body:`<p>Welcome to Veltara! As discussed in your interview, you are our first Sustainability Manager, and your first mission is a big one.</p>
+  <p>We need a <b>GHG Protocol carbon footprint for FY2025</b>, covering the whole group, that our auditor can review with limited assurance. It will go into our first ESRS sustainability statement (table E1-6). The board approves the figures on <b>13 March</b>, and the auditor wants the draft by <b>27 February</b>.</p>
+  <p>Last year a consultant gave us a quick estimate of ~2,100 t. I'd love to know if that is right. Everyone has been told to help you. Hugo (CFO) will send the group structure shortly.</p><p>Claire</p>`,
+  tasks:[{type:'decision',id:'d_start',q:'Before any numbers, how do you organise the work?',opts:[
+   {id:'a',l:'Re-run last year\'s consultant spreadsheet with 2025 spend. Fast, and the board already knows the number.',v:'bad',fx:{audit:-8,days:-2},fb:'A spend-only estimate has no activity data, no Scope 1/2 split and no sold products. It cannot pass limited assurance and would repeat last year\'s blind spots.'},
+   {id:'b',l:'Write an inventory plan: consolidation approach, base year, data owner per source, evidence folder, timeline with the auditor.',v:'best',fx:{audit:10,trust:5,days:-2},fb:'This is what assurance providers look for first: documented boundaries, owners and an audit trail. Each later decision gets traced to this plan.'},
+   {id:'c',l:'Buy a carbon-accounting platform first and start once onboarding is finished.',v:'ok',fx:{audit:2,days:-6},fb:'Software helps with workflow and factor updates, but it does not decide your boundaries or collect data for you. You lost a week and a half of your calendar.'}],
+   ref:'GHG Protocol Corporate Standard, ch. 1 (principles) and ch. 7 (inventory quality management)'}]},
+ {n:2, from:'cfo', time:'Tue 06 Jan 14:40', subj:'Group structure: what do we include?', files:['f_org'], cost:1,
+  body:`<p>Hi, attached is the legal structure. Kodaly Labs is 70% ours, the Paris office is leased, and we hold 20% of Brightcell.</p><p>For the financial statements we fully consolidate Portugal and Kodaly, and equity-account Brightcell. What do you need from me for the carbon footprint? Please tell me how you treat each entity so I can brief the auditor.</p><p>Hugo</p>`,
+  tasks:[
+   {type:'decision',id:'d_approach',q:'Which consolidation approach do you choose for the group inventory?',opts:[
+    {id:'a',l:'Financial control, aligned with the consolidated financial statements, plus any entity or asset under our operational control.',v:'best',fx:{audit:6},fb:'This is how ESRS E1 frames it: the consolidated group (as in the financial statements), plus associates, JVs or assets over which you have operational control. Here it gives the same perimeter as operational control, and it reconciles easily with the financial statements.'},
+    {id:'b',l:'Operational control only.',v:'ok',fx:{audit:3},fb:'Valid under the GHG Protocol, and for Veltara the perimeter is the same. For CSRD you will still have to explain how it maps to the consolidated financial scope.'},
+    {id:'c',l:'Equity share.',v:'ok',fx:{audit:0,days:-1},fb:'Valid under the GHG Protocol but heavier: every entity is taken at its ownership share (Kodaly 70%, Brightcell 20%), and it diverges from the ESRS logic. It costs you a day of reconciliations.'},
+    {id:'d',l:'Only the parent company, Veltara Systems SAS.',v:'bad',fx:{audit:-8},fb:'This leaves out Portugal and Berlin. The GHG Protocol requires one consistent approach across the group, and CSRD reporting follows the consolidated group.'}],ref:'GHG Protocol Corporate Standard, ch. 3; ESRS E1 application requirements on the consolidation scope'},
+   {type:'decision',id:'d_kodaly',q:'Kodaly Labs (70% owned, managed by Veltara): how much of its emissions goes into Scope 1 and 2?',opts:[
+    {id:'a',l:'100%. We control it.',v:'best',fx:{audit:4},fb:'Under a control approach, a controlled entity is included at 100%, whatever the ownership share.'},
+    {id:'b',l:'70%, our ownership share.',v:'bad',fx:{audit:-5},fb:'Ownership shares apply only under the equity-share approach. Mixing approaches is a classic assurance finding.'},
+    {id:'c',l:'0%. It is a separate legal entity.',v:'bad',fx:{audit:-6},fb:'Legal separation does not matter: control does.'}],ref:'GHG Protocol Corporate Standard, ch. 3, Table 2'},
+   {type:'decision',id:'d_paris',q:'The leased Paris office (Veltara\'s own meter, staff and fit-out): where do its energy emissions go?',opts:[
+    {id:'a',l:'Scope 1 and 2: we operate the space.',v:'best',fx:{audit:4},fb:'With a lease where you control operations, the tenant reports the energy in Scope 1/2. Cat. 8 is only for leased assets not already included in Scope 1/2.'},
+    {id:'b',l:'Scope 3, Cat. 8 (upstream leased assets).',v:'bad',fx:{audit:-4},fb:'Cat. 8 applies when the leased asset is outside your Scope 1/2 boundary. Under control approaches, a space you operate sits in Scope 1/2.'},
+    {id:'c',l:'Exclude it: the landlord reports it.',v:'bad',fx:{audit:-5},fb:'The landlord does not consume that electricity: you do, on your own meter.'}],ref:'GHG Protocol Corporate Standard, Appendix F (leased assets)'},
+   {type:'decision',id:'d_bright',q:'Brightcell (20%, equity-accounted, run by its founders): how do you report it?',opts:[
+    {id:'a',l:'Scope 3 Cat. 15 (investments): 20% of Brightcell\'s Scope 1+2.',v:'best',fx:{audit:3},fb:'No control, so it is not in Scope 1/2. Its emissions go into Cat. 15, proportional to your equity share.'},
+    {id:'b',l:'Scope 1 and 2 at 20%.',v:'bad',fx:{audit:-4},fb:'That would be the equity-share approach, which is not the one you chose.'},
+    {id:'c',l:'Ignore it: too small.',v:'ok',fx:{audit:-1},fb:'It is small (28 t), but Cat. 15 must still be screened and the exclusion justified. Including it costs ten minutes.'}],ref:'GHG Protocol Scope 3 Standard, Category 15'}]},
+ {n:3, from:'aud', time:'Thu 08 Jan 10:05', subj:'Kick-off: Scope 3 screening before fieldwork', files:['f_ghg'], cost:1,
+  body:`<p>Dear colleague,</p><p>Thank you for the kick-off call. Before we plan fieldwork, please send your <b>Scope 3 relevance screening</b>: which of the 15 categories are relevant for Veltara (SaaS plus hardware kits), and why the others are not.</p><p>We will test the justification of every exclusion.</p><p>Kind regards,<br>Ines Bauer, Kessler & Partners</p>`,
+  tasks:[{type:'multi',id:'d_screen',q:'Tick every Scope 3 category that is relevant for Veltara in FY2025.',items:[
+   [1,'Purchased goods & services',true,'Kits for resale, cloud, services: large.'],[2,'Capital goods',true,'Laptops, servers, Lisbon fit-out bought in 2025.'],[3,'Fuel- and energy-related',true,'Always relevant when you use fuels and electricity.'],[4,'Upstream transport & distribution',true,'Kits shipped from Taiwan and to customers, paid by Veltara.'],[5,'Waste generated in operations',true,'Small but present: office waste, WEEE.'],[6,'Business travel',true,'3.8 million flight km.'],[7,'Employee commuting',true,'640 staff.'],[8,'Upstream leased assets',false,'Paris lease is already in Scope 1/2.'],[9,'Downstream transport',false,'Delivery to customers is paid by Veltara, so it is Cat. 4.'],[10,'Processing of sold products',false,'Kits are sold finished, no processing.'],[11,'Use of sold products',true,'Kits consume electricity 24/7 for 7 years.'],[12,'End-of-life of sold products',true,'Kits become WEEE.'],[13,'Downstream leased assets',false,'Veltara leases nothing out.'],[14,'Franchises',false,'No franchises.'],[15,'Investments',true,'20% stake in Brightcell.']],
+   ref:'GHG Protocol Scope 3 Standard: minimum boundaries by category; ESRS E1-6 significant categories'}]},
+ {n:4, from:'fac', time:'Mon 12 Jan 08:31', subj:'Scope 1 data pack + waste register', files:['f_gas_lyon','f_gas_berlin','f_gen','f_fgas','f_fleet','f_waste'], cost:3,
+  body:`<p>Hello! Everything I have is in the Facilities folder: gas invoices (Lyon, and Berlin from Kodaly), the generator log, the FroidTech report from August (the server-room leak), the fuel card export from Finance, and the waste register.</p><p>Tell me if anything is missing. And yes, our 3 electric company cars are charged in our car park, so maybe they need adding somewhere?</p><p>Marc</p>`,
+  tasks:[
+   {type:'decision',id:'d_ev',q:'Marc\'s question: where do the 31 MWh charged by the electric company cars go?',opts:[
+    {id:'a',l:'Add them to Scope 1 "mobile combustion" with the fleet.',v:'bad',fx:{audit:-4},fb:'EVs burn no fuel, so there are no Scope 1 emissions. And the kWh are already on the Lyon meter: adding them again is double counting.'},
+    {id:'b',l:'Nothing to add: they are already inside the Lyon electricity meter, so they are in Scope 2.',v:'best',fx:{audit:4},fb:'Correct. Check sub-meters before adding any line: double counting is one of the most common assurance findings.'},
+    {id:'c',l:'Add them to Scope 3 Cat. 7 (commuting).',v:'bad',fx:{audit:-3},fb:'These are company cars charged on your own meter, not employee commuting.'}],ref:'GHG Protocol Corporate Standard, ch. 4 (avoid double counting within scopes)'},
+   {type:'inputs',lines:['s1_gas','s1_gen','s1_fgas','s1_fleet','c5'],to:'fac'}]},
+ {n:5, from:'brk', time:'Wed 14 Jan 16:22', subj:'Zero-carbon electricity for your 2025 report: offer inside', files:['f_elec','f_contracts','f_heat','f_broker'], cost:2,
+  body:`<p>Dear Sustainability Manager,</p><p>Congratulations on your new role! Many of our clients make their electricity <b>zero-carbon</b> in their report by buying Guarantees of Origin. For your Lyon site (1,180 MWh), it is only <b>€2,360</b>, done in 5 days.</p><p>Shall I reserve the volume?</p><p>Nadia Ferrand, VoltaBroker</p><p class="lead" style="font-size:12.5px">(Facilities shared the electricity bills, the contract extracts and the Paris heating statement in the Facilities and Legal folders.)</p>`,
+  tasks:[
+   {type:'decision',id:'d_goo',q:'What do you do with the GoO offer?',opts:[
+    {id:'a',l:'Buy it and report only the market-based figure: "Lyon electricity = 0".',v:'bad',fx:{audit:-8,trust:-6},fb:'The GHG Protocol and ESRS E1 require both location-based and market-based Scope 2. Publishing only the certificate-backed figure looks like greenwashing.'},
+    {id:'b',l:'Buy it, report both methods, and disclose the instrument (unbundled GoOs, no additionality).',v:'ok',fx:{audit:3,trust:-1},fb:'Allowed: unbundled GoOs from the same market and vintage meet the Scope 2 quality criteria. NGOs and some clients will call it a paper exercise, so disclose it plainly. Your market-based Lyon figure becomes 0.'},
+    {id:'c',l:'Do not buy for 2025. Report both methods honestly, and launch a tender for a green tariff or PPA from 2026.',v:'best',fx:{audit:5,trust:4},fb:'A credible path: transparent 2025 baseline, real procurement lever for the transition plan (ESRS E1-1).'}],ref:'GHG Protocol Scope 2 Guidance: dual reporting and Scope 2 quality criteria'},
+   {type:'inputs',lines:['s2_loc','s2_mb','c3'],to:'aud'}]},
+ {n:6, from:'cto', time:'Mon 19 Jan 11:48', subj:'Our cloud is green, right?', files:['f_cloud'], cost:1,
+  body:`<p>Hey! Good news: Stratocloud says our footprint is only <b>18 t</b> because they buy renewables. I attached their export. So we can basically put cloud at 18 and move on?</p><p>Tomás</p>`,
+  tasks:[{type:'decision',id:'d_cloud',q:'Which value do you put in Cat. 1 for cloud hosting?',opts:[
+   {id:'a',l:'18.4 t: provider market-based figure.',v:'ok',fx:{audit:-2,trust:-3},fb:'Supplier-specific, but it rests entirely on the provider\'s certificate allocation, which you cannot verify. If you use it, disclose the location-based value alongside it.'},
+   {id:'b',l:'312 t: provider location-based figure, with 18.4 t market-based disclosed in the notes.',v:'best',fx:{audit:5,trust:3},fb:'Supplier-specific activity data, conservative and verifiable, transparently documented. Best balance for limited assurance.'},
+   {id:'c',l:'465 t: spend-based (€1,860k × 250 kg/k€).',v:'ok',fx:{audit:1},fb:'Acceptable as a fallback, but lower quality than the supplier-specific data you already have.'},
+   {id:'d',l:'0 t: the provider is carbon neutral.',v:'bad',fx:{audit:-8,trust:-4},fb:'Provider offsets or certificates do not remove the emissions from your Scope 3 inventory.'}],ref:'GHG Protocol Scope 3 Standard, Cat. 1, supplier-specific method; data quality hierarchy'}]},
+ {n:7, from:'pro', time:'Thu 22 Jan 09:15', subj:'Purchases, assets and the kit supplier', files:['f_ledger','f_cap','f_assets','f_kitpcf','f_bright'], cost:3,
+  body:`<p>Hi, I exported the full spend ledger. Marion added the capitalisation policy and the asset additions. Brightcell's investor pack is in the Finance folder too.</p><p>For the VelSense kits, Formosa IoT gave us a rough datasheet (18 kg per kit). They can produce a verified PCF, but it takes about 3 weeks. Your call.</p><p>Sofia</p>`,
+  tasks:[
+   {type:'decision',id:'d_pcf',q:'Kits are a big Cat. 1 line. Do you ask the supplier for the verified PCF?',opts:[
+    {id:'a',l:'Yes: request the verified ISO 14067 PCF (3 working days of your calendar to follow up).',v:'best',fx:{audit:5,trust:2,days:-3},fb:'Primary, verified supplier data is the top of the data-quality hierarchy, and it starts supplier engagement for your reduction plan. The PCF has arrived: 15.2 kg per kit. Use it.'},
+    {id:'b',l:'No: use the 18 kg estimate and flag it as secondary data.',v:'ok',fx:{audit:0},fb:'Acceptable and transparent. Plan to collect primary data next year.'}],ref:'GHG Protocol Scope 3 Standard: data quality; ESRS E1 AR on the share of primary data'},
+   {type:'decision',id:'d_capex',q:'How do you treat the laptops, servers and Lisbon fit-out bought in 2025?',opts:[
+    {id:'a',l:'Spread them over their depreciation period, as the French Bilan Carbone method does.',v:'bad',fx:{audit:-5},fb:'That is the Bilan Carbone convention. The GHG Protocol counts 100% of cradle-to-gate emissions in the year of acquisition (Cat. 2), with no depreciation.'},
+    {id:'b',l:'100% in 2025 in Cat. 2, for capitalised items only. Small items (< €500) stay in Cat. 1.',v:'best',fx:{audit:5},fb:'Correct, and consistent with the accounting policy. This also prevents double counting between Cat. 1 and Cat. 2.'}],ref:'GHG Protocol Scope 3 Standard, Category 2'},
+   {type:'inputs',lines:['c1_kits','c1_services','c2','c15'],to:'pro'}]},
+ {n:8, from:'sc', time:'Tue 27 Jan 13:02', subj:'Logistics data for the kits', files:['f_ship','f_parcel'], cost:2,
+  body:`<p>Hi! Shipments log and our parcel carrier's GLEC report are in the Supply chain folder. Q4 was messy: the port strike forced us to fly a quarter of the kits. Ops would like to keep air as a "safety lane" next year.</p><p>Lena</p>`,
+  tasks:[
+   {type:'decision',id:'d_air',q:'What do you recommend to the COO about air freight?',opts:[
+    {id:'a',l:'Keep 25% air as a safety lane: service level first.',v:'bad',fx:{trust:-3},fb:'Run your Cat. 4 numbers: air is about 140× more carbon-intensive per t·km than sea here, and it makes up over 80% of Cat. 4.'},
+    {id:'b',l:'Hold 6 weeks of buffer stock in Lyon and keep air for genuine emergencies, with a KPI tracked monthly.',v:'best',fx:{trust:4,audit:1},fb:'A concrete lever with a KPI, ready for the transition plan (ESRS E1-3 actions).'},
+    {id:'c',l:'No opinion: logistics is not my job.',v:'ok',fx:{trust:-2},fb:'Your inventory just showed where the hotspot is. Sustainability managers earn influence by turning data into decisions.'}],ref:'ESRS E1-3: actions and resources'},
+   {type:'inputs',lines:['c4'],to:'sc'}]},
+ {n:9, from:'hr', time:'Mon 02 Feb 10:20', subj:'Travel and commuting data', files:['f_travel','f_survey','f_tele'], cost:3,
+  body:`<p>Hello, here is the travel agency report and the commuting survey (71% response rate, extrapolated to all 640 staff). We also have the telework policy if useful.</p><p>Julie</p><p class="lead" style="font-size:12.5px">PS from Hugo (CFO), in copy: "Business travel was exceptional in 2025 because of the US launch. Can we leave it out as a one-off?"</p>`,
+  tasks:[
+   {type:'decision',id:'d_cfo',q:'Hugo asks to exclude business travel as a "one-off". Your answer?',opts:[
+    {id:'a',l:'Agree: 2025 was exceptional.',v:'bad',fx:{audit:-8,trust:-3},fb:'Completeness: there is no "one-off" exemption. Exceptional events are explained in the narrative, not removed. Your auditor would raise it immediately.'},
+    {id:'b',l:'Keep it, and explain the US launch in the narrative so readers can compare years.',v:'best',fx:{audit:4,trust:2},fb:'Transparent and complete. It also sets a realistic base year for the reduction trajectory.'}],ref:'GHG Protocol principles: completeness and transparency'},
+   {type:'decision',id:'d_rf',q:'Aviation: the agency includes radiative forcing (RF, non-CO2 effects). What do you report in Cat. 6?',opts:[
+    {id:'a',l:'CO2e without RF in the Cat. 6 total (Kyoto gases only), with the RF-inclusive figure disclosed in a note.',v:'best',fx:{audit:5,trust:3},fb:'Consistent with the GHG Protocol and ESRS (Kyoto gases), and transparent about the larger climate impact.'},
+    {id:'b',l:'Include RF in the Cat. 6 total.',v:'ok',fx:{audit:2,trust:3},fb:'Conservative and defensible, but it mixes non-GHG effects into a GHG total. Say so clearly in the methodology.'},
+    {id:'c',l:'Without RF, and no mention of RF anywhere.',v:'ok',fx:{audit:0,trust:-3},fb:'Technically aligned, but it hides material information that stakeholders increasingly expect.'}],ref:'GHG Protocol Scope 3 Standard, Cat. 6 (non-CO2 effects optional, report separately)'},
+   {type:'decision',id:'d_tele',q:'Do you include teleworking emissions in Cat. 7?',opts:[
+    {id:'a',l:'Yes, and disclose them as an optional item.',v:'best',fx:{audit:2,trust:2},fb:'Optional under the GHG Protocol, but it gives a fair view of hybrid work: you cannot claim a commuting reduction without counting home energy.'},
+    {id:'b',l:'No: commuting only, with the exclusion stated.',v:'ok',fx:{audit:1},fb:'Allowed. State it in the methodology note.'}],ref:'GHG Protocol Scope 3 Standard, Category 7 (teleworking optional)'},
+   {type:'inputs',lines:['c6','c7'],to:'hr'}]},
+ {n:10, from:'cmo', time:'Thu 05 Feb 17:55', subj:'Quick one: we\'re a software company, right?', files:['f_product','f_sales','f_offset'], cost:2,
+  body:`<p>Hi! Two things before the board:</p><ul><li>I heard you want to add the <b>electricity our customers use</b> for our kits. We're a software company, it'll make us look like a utility! Let's leave it out?</li><li>Competitors all say "carbon neutral". ClimaFix offers 4,000 credits for €18k so we can say it too. Attached. It would be great for the website and the packaging.</li></ul><p>Antoine</p><p class="lead" style="font-size:12.5px">(Yara from Product shared the kit datasheet and sales by country in the Product folder.)</p>`,
+  tasks:[
+   {type:'decision',id:'d_cat11',q:'Cat. 11 (use of sold kits): what do you decide?',opts:[
+    {id:'a',l:'Exclude it: we are a software company.',v:'bad',fx:{audit:-10,trust:-4},fb:'Kits are energy-using products that consume electricity directly. Their use phase is a required ("direct") Cat. 11 emission, and here one of the largest categories.'},
+    {id:'b',l:'Include direct use-phase emissions of the kits (and Cat. 12). Exclude the optional indirect use (customers\' screens viewing the SaaS), with a justification.',v:'best',fx:{audit:6,trust:2},fb:'Exactly the Scope 3 Standard split: direct use-phase emissions of energy-using products are required; indirect use-phase emissions are optional.'},
+    {id:'c',l:'Include the kits, and also estimate customers\' devices for the SaaS.',v:'ok',fx:{audit:2,days:-2},fb:'Allowed as optional, but weak data and two more days. Report it separately, outside the Cat. 11 total.'}],ref:'GHG Protocol Scope 3 Standard, Category 11 (direct vs indirect use-phase)'},
+   {type:'decision',id:'d_claim',q:'The "carbon neutral" offer?',opts:[
+    {id:'a',l:'Buy the credits and claim "carbon neutral company" on the website, packaging and report.',v:'bad',fx:{audit:-6,trust:-10},fb:'Credits never reduce E1-6 gross emissions (they go to E1-7). Under the EU directive on empowering consumers for the green transition (2024/825), product claims of neutral impact based on offsetting are banned from 27 September 2026. Cheap 2019 avoidance credits add reputational risk.'},
+    {id:'b',l:'Decline. Report gross emissions, set a reduction target, and if credits are ever bought, disclose them separately in E1-7 as a contribution, not neutrality.',v:'best',fx:{audit:4,trust:6},fb:'Credible and compliant. Communicate on reductions and targets, not on offsets.'},
+    {id:'c',l:'Decline, and avoid any external climate communication this year.',v:'ok',fx:{trust:-2},fb:'Safe, but you miss the chance to explain your baseline and plan to clients and the bank.'}],ref:'ESRS E1-6/E1-7; Directive (EU) 2024/825'},
+   {type:'inputs',lines:['c11','c12'],to:'pm'}]},
+ {n:11, from:'aud', time:'Mon 16 Feb 09:00', subj:'Draft E1-6 table due 27 February', files:['f_esrs'], cost:2,
+  body:`<p>Dear colleague,</p><p>Fieldwork starts next week. Please submit the <b>draft ESRS E1-6 table</b> with your methodology choices, including GHG intensity per net revenue. The Report app on your laptop builds it from your workbook.</p><p>We will compare it with the evidence and give our limited assurance conclusion.</p><p>Ines Bauer</p>`,
+  tasks:[{type:'report'}]}
+];
+
+/* ============ STATE ============ */
+const START = {m:1, read:{}, dec:{}, multi:{}, inputs:{}, lineStatus:{}, attempts:{}, revealed:{}, taskDone:{}, kpi:{audit:50,trust:50,days:30}, app:'mail', selMail:1, selFile:null, newFiles:{}, chat:[], calc:[], report:{}, final:null, seen:{}};
+let S;
+const KEY='carbondesk-veltara-v1';
+function load(){ try{ const raw=localStorage.getItem(KEY); S = raw ? Object.assign(structuredClone(START), JSON.parse(raw)) : structuredClone(START);}catch(e){ S=structuredClone(START);} }
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+load();
+
+const CHATS = {
+ 1:[['cfo','Welcome! Board is 13 March. Ines (auditor) wants the draft 2 weeks earlier, so plan backwards from 27 Feb.']],
+ 4:[['cto','FYI the EV chargers in the Lyon car park are wired to the main building meter, sub-meter EV-01.'],['fac','The generator ran its monthly tests plus one long run during the July outage. Deliveries match consumption.']],
+ 5:[['fin','I checked: Lyon and Paris are on "Pro Classique", no green option. Lisbon has the renewable contract with GoOs.']],
+ 7:[['fin','Reminder: capitalisation threshold is €500 per item. Laptops and monitors are capitalised.'],['pro','The ledger has EVERYTHING in it, including energy, cloud, travel and kits. Careful not to count things twice 😉']],
+ 8:[['sc','Air share was 25% of kits received, all in Q4. Mass per kit is on Formosa\'s datasheet.']],
+ 9:[['hr','Survey figures are averages per employee. Multiply by 640 and by 2 for the return trip.']],
+ 10:[['pm','Kits are always on, 24/7. Use the sales split by country for the grid factor.'],['cmo','Competitors claim carbon neutral, we look bad in tenders!']],
+ 11:[['ceo','Thank you for all this work. Looking forward to the board pack 🙏']]
+};
+
+function fileUnlocked(f){ if(f.id==='f_kitpcf2') return S.dec.d_pcf==='a'; return f.m<=S.m; }
+function unlockMission(n){
+  const M = MISSIONS[n]; if(!M) return;
+  (M.files||[]).forEach(id=>{ if(!S.seen[id]) S.newFiles[id]=true; });
+  (CHATS[n]||[]).forEach(c=>S.chat.push({who:c[0],text:c[1],m:n}));
+}
+if(!S.seen._init){ S.seen._init=true; unlockMission(1); save(); }
+
+/* ============ KPI / helpers ============ */
+const clamp = (x,a,b)=>Math.max(a,Math.min(b,x));
+function applyFx(fx){ if(!fx) return; S.kpi.audit=clamp(S.kpi.audit+(fx.audit||0),0,100); S.kpi.trust=clamp(S.kpi.trust+(fx.trust||0),0,100); S.kpi.days+=(fx.days||0); }
+function parseNum(v){ if(v==null) return NaN; const s=String(v).replace(/\s| | /g,'').replace(',','.'); return s===''?NaN:Number(s); }
+function lineVal(id){ const L=LINES.find(l=>l.id===id); if(L.auto) return S.dec.d_cloud ? keys()[id] : NaN; return parseNum(S.inputs[id]); }
+function status(id){ const k=keys()[id]; const v=lineVal(id); if(isNaN(v)) return 'pend'; if(k===0) return v===0?'ok':'no'; const e=Math.abs(v-k)/k; return e<=0.02?'ok':(e<=0.10?'close':'no'); }
+function lineMission(id){ return LINES.find(l=>l.id===id).m; }
+let toastT;
+function toast(html){ const os=document.getElementById('os'); let el=os.querySelector('.toast'); if(el) el.remove(); el=document.createElement('div'); el.className='toast'; el.innerHTML=html; os.appendChild(el); clearTimeout(toastT); toastT=setTimeout(()=>el.remove(),4200); }
+const esc = s => String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function missionTasksDone(n){ const M=MISSIONS[n]; return M.tasks.every((t,i)=>S.taskDone[n+'_'+i]); }
+function completeMissionIfDone(n){
+  if(n!==S.m || !missionTasksDone(n) || n>=11) return;
+  S.kpi.days -= MISSIONS[n].cost;
+  S.m = n+1; unlockMission(S.m);
+  const M=MISSIONS[S.m];
+  toast(`<b>New email</b><br>${esc(P[M.from].n)}: ${esc(M.subj)}`);
+}
+
+/* ============ RENDER ============ */
+const ICON = {
+ mail:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 6.5 8.5 6.5 8.5-6.5"/></svg>',
+ files:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>',
+ wb:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M3 14h18M9 4v16"/></svg>',
+ ef:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 4h11l3 3v13H5z"/><path d="M8 10h8M8 14h8M8 18h5"/></svg>',
+ calc:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 12h.01M12 12h.01M16 12h.01M8 16h.01M12 16h.01M16 16h.01"/></svg>',
+ chat:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 5h16v11H9l-5 4z"/></svg>',
+ rep:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 3h9l4 4v14H6z"/><path d="M9 17v-4M12 17v-7M15 17v-2"/></svg>'
+};
+const APPS = [['mail','Mail'],['files','Files'],['wb','Workbook'],['ef','EF Library'],['calc','Calculator'],['chat','Chat'],['rep','Report']];
+
+function render(){
+  // KPIs
+  const prog = Math.round((S.m-1 + (S.final?1:0))/11*100);
+  document.getElementById('kpis').innerHTML =
+   `<span class="kpi days ${S.kpi.days<5?'low':''}" title="Working days left before the draft is due to the auditor">Days to deadline <b>${S.kpi.days}</b></span>`+
+   `<span class="kpi" title="How well your choices would stand up to an auditor">Audit readiness <span class="bar"><span style="width:${S.kpi.audit}%"></span></span><b>${S.kpi.audit}</b></span>`+
+   `<span class="kpi" title="How credible you are with colleagues, clients, the bank">Stakeholder trust <span class="bar"><span style="width:${S.kpi.trust}%"></span></span><b>${S.kpi.trust}</b></span>`+
+   `<span class="kpi">Mission <b>${Math.min(S.m,11)}/11</b></span>`;
+  const dayNames=['05 Jan','06 Jan','08 Jan','12 Jan','14 Jan','19 Jan','22 Jan','27 Jan','02 Feb','05 Feb','16 Feb'];
+  document.getElementById('clock').textContent = dayNames[Math.min(S.m,11)-1]+' 2026';
+  // dock
+  const unreadMail = MISSIONS.filter((M,i)=>M && i<=S.m && !S.read[i]).length;
+  const unreadChat = S.chat.filter(c=>!c.seen).length;
+  const newFiles = Object.keys(S.newFiles).length;
+  document.getElementById('dock').innerHTML = APPS.map(([id,l])=>{
+    let b=''; if(id==='mail'&&unreadMail) b=unreadMail; if(id==='chat'&&unreadChat) b=unreadChat; if(id==='files'&&newFiles) b=newFiles;
+    return `<button class="app ${S.app===id?'on':''}" data-app="${id}" aria-label="${l}">${ICON[id]}<span class="l">${l}</span>${b?`<span class="badge">${b}</span>`:''}</button>`;}).join('');
+  const d=document.getElementById('desktop');
+  const views={mail:viewMail,files:viewFiles,wb:viewWB,ef:viewEF,calc:viewCalc,chat:viewChat,rep:viewReport};
+  d.innerHTML = views[S.app]();
+  if(S.final && S.showFinal) d.insertAdjacentHTML('beforeend', viewFinal());
+  bindView();
+}
+function win(title, sub, body, cls=''){ return `<div class="win"><div class="winbar"><div class="dots"><i></i><i></i><i></i></div><span class="wintitle">${title}</span><span class="winsub">${sub||''}</span></div><div class="winbody ${cls}">${body}</div></div>`; }
+
+/* ---- Mail ---- */
+function viewMail(){
+  const ids=[]; for(let i=Math.min(S.m,11);i>=1;i--) ids.push(i);
+  const list = ids.map(i=>{const M=MISSIONS[i],p=P[M.from],done=missionTasksDone(i);
+    return `<button class="mail-item ${S.selMail===i?'sel':''} ${S.read[i]?'':'unread'}" data-mail="${i}"><span class="from"><span>${esc(p.n)}</span><time>${M.time.split(' ').slice(1,3).join(' ')}</time></span><span class="subj">${esc(M.subj)}</span><span class="snip">${M.body.replace(/<[^>]+>/g,' ').slice(0,90)}</span><span class="tag ${done?'done':''}">Mission ${i} · ${done?'done':'to do'}</span></button>`;}).join('');
+  const M=MISSIONS[S.selMail]; const p=P[M.from];
+  const atts=(M.files||[]).map(id=>{const f=FILES.find(x=>x.id===id);const ext=f.name.split('.').pop();return `<button class="att" data-open="${id}"><span class="ext ${ext}">${ext}</span>${esc(f.name)}</button>`;}).join('');
+  const tasks=M.tasks.map((tk,i)=>renderTask(S.selMail,tk,i)).join('');
+  const read = `<div class="read"><button class="btn ghost mback" data-back="1">← Inbox</button><h2>${esc(M.subj)}</h2>
+   <div class="hdr"><span class="avatar" style="background:${p.c}">${ini(p.n)}</span><div><div class="who">${esc(p.n)} <span class="role">&lt;${p.e}&gt;</span></div><div class="role">${esc(p.r)} · ${M.time}</div></div></div>
+   <div class="body">${M.body}</div>${atts?`<div class="atts">${atts}</div>`:''}${tasks}</div>`;
+  return win('Mail', `${ids.length} message${ids.length>1?'s':''}`, `<div class="list">${list}</div>${read}`, 'split'+(S.mobileOpen?' showing':''));
+}
+function renderTask(n,tk,i){
+  const key=n+'_'+i, done=S.taskDone[key];
+  const active = n===S.m || done;
+  if(!active) return '';
+  // sequence: only show task i if previous done
+  if(i>0 && !S.taskDone[n+'_'+(i-1)]) return '';
+  const head = `<div class="task-h"><span>Your task${MISSIONS[n].tasks.length>1?` · ${i+1}/${MISSIONS[n].tasks.length}`:''}</span>${done?'<span class="done-tag">✓ sent</span>':''}</div>`;
+  if(tk.type==='decision'){
+    const ch=S.dec[tk.id];
+    const opts=tk.opts.map(o=>`<label class="opt ${ch===o.id?'chosen':''} ${done?'lock':''}"><input type="radio" name="${tk.id}" value="${o.id}" ${ch===o.id?'checked':''} ${done?'disabled':''}><span>${o.l}</span></label>`).join('');
+    let fb='';
+    if(done){const o=tk.opts.find(x=>x.id===ch);fb=`<div class="fb ${o.v}"><b class="t">${o.v==='best'?'Strong choice':o.v==='ok'?'Acceptable, with trade-offs':'Risky choice'}</b>${o.fb}${fxPills(o.fx)}${ref(tk.ref)}</div>`;}
+    return `<div class="task">${head}<div class="task-b"><p class="q">${tk.q}</p>${opts}${done?fb:`<button class="btn" data-decide="${key}" data-tid="${tk.id}">Send decision</button>`}</div></div>`;
+  }
+  if(tk.type==='multi'){
+    const sel=S.multi[tk.id]||{};
+    const items=tk.items.map(([c,l,rel,why])=>{const on=!!sel[c];const cls=done?(on===rel?'right':'wrong'):'';
+      return `<label class="check ${cls}"><input type="checkbox" data-multi="${tk.id}" value="${c}" ${on?'checked':''} ${done?'disabled':''}><span><b>${c}.</b> ${l}${done?`<small>${rel?'Relevant':'Not relevant'}: ${why}</small>`:''}</span></label>`;}).join('');
+    let fb=''; if(done){const right=tk.items.filter(([c,,rel])=>!!sel[c]===rel).length; fb=`<div class="fb ${right>=14?'best':right>=11?'ok':'bad'}"><b class="t">${right}/15 categories correctly screened</b>Every exclusion needs a written justification. Relevance depends on size, influence, risk and stakeholder expectations, not on how hard the data is to find.${ref(tk.ref)}</div>`;}
+    return `<div class="task">${head}<div class="task-b"><p class="q">${tk.q}</p><div class="check-grid">${items}</div>${done?fb:`<button class="btn" data-multisend="${key}" data-tid="${tk.id}">Send screening to Ines</button>`}</div></div>`;
+  }
+  if(tk.type==='inputs'){
+    const rows=tk.lines.map(id=>{const L=LINES.find(l=>l.id===id);const st=S.lineStatus[id];const v=S.inputs[id];
+      const reveal = (S.attempts[key]||0)>=2 && st==='no' && !done ? ` <button class="btn ghost" data-reveal="${id}" style="padding:2px 8px;font-size:11px">Show expert working (−3 audit)</button>`:'';
+      return `<tr><td>${L.label}</td><td style="font-family:var(--mono);text-align:right">${v!==undefined&&v!==''?esc(v)+' t':'<span style="color:var(--faint)">empty</span>'}</td><td>${st?`<span class="st ${st}">${({ok:'✓ matches evidence',close:'≈ within 10%',no:'✗ check again',pend:'—'})[st]}</span>`:''}${reveal}</td></tr>`;}).join('');
+    const expl = tk.lines.filter(id=>S.revealed[id]).map(id=>`<div class="fb ok"><b class="t">Expert working · ${LINES.find(l=>l.id===id).label}</b>${WORK[id]()}</div>`).join('');
+    const to=P[tk.to];
+    return `<div class="task">${head}<div class="task-b"><p class="q">Calculate these lines in the <b>Workbook</b> app (tCO2e), using the files, the EF library and the calculator. Then send them to ${esc(to.n)}.</p>
+      <div class="sheet" style="margin-bottom:10px"><table><thead><tr><th>Workbook line</th><th>Your value</th><th>Check</th></tr></thead><tbody>${rows}</tbody></table></div>${expl}
+      ${done?`<div class="fb best"><b class="t">Sent to ${esc(to.n)}</b>Evidence and calculations are filed for the auditor.</div>`:`<button class="btn ghost" data-goapp="wb">Open Workbook</button> <button class="btn" data-checksend="${key}">Check & send</button>`}</div></div>`;
+  }
+  if(tk.type==='report'){
+    return `<div class="task">${head}<div class="task-b"><p class="q">Open the Report app, review your ESRS E1-6 table, complete the intensity and methodology fields, and submit to Kessler & Partners.</p>${S.final?`<button class="btn" data-showfinal="1">See the auditor\'s conclusion</button>`:`<button class="btn" data-goapp="rep">Open Report</button>`}</div></div>`;
+  }
+  return '';
+}
+function fxPills(fx){ if(!fx) return ''; const p=[]; if(fx.audit) p.push(`audit ${fx.audit>0?'+':''}${fx.audit}`); if(fx.trust) p.push(`trust ${fx.trust>0?'+':''}${fx.trust}`); if(fx.days) p.push(`days ${fx.days}`); return p.length?`<div class="fx">${p.map(x=>`<span>${x}</span>`).join('')}</div>`:''; }
+
+/* expert workings */
+const WORK = {
+ s1_gas:()=>`(${fmt(sum(D.gasLyon))} + ${fmt(D.gasBerlin)}) kWh × ${F.ng} = ${fmt(keys().s1_gas,2)} t`,
+ s1_gen:()=>`${fmt(D.gen)} L delivered (≈ burned) × ${F.dsl} = ${fmt(keys().s1_gen,2)} t`,
+ s1_fgas:()=>`${D.r410a} kg R-410A added after the leak × GWP ${F.r410a} = ${fmt(keys().s1_fgas,2)} t. The R-32 unit had no leak.`,
+ s1_fleet:()=>`${fmt(sum(D.fleetDiesel))} L diesel × ${F.dsl} + ${fmt(sum(D.fleetPetrol))} L petrol × ${F.pet} = ${fmt(keys().s1_fleet,2)} t. AdBlue is not a fuel; EV charging is already on the Lyon meter.`,
+ c5:()=>`${D.waste.mixed} t × ${F.mixed} + ${D.waste.weee} t × ${F.weee} + ${D.waste.paper} t × ${F.paper} = ${fmt(keys().c5,2)} t`,
+ s2_loc:()=>`Lyon ${fmt(D.elec.lyon)} + Paris ${fmt(D.elec.paris)} kWh × ${F.frL}; Lisbon ${fmt(D.elec.lisbon)} × ${F.ptL}; Berlin ${fmt(D.elec.berlin)} × ${F.deL}; Paris heat ${fmt(D.heatParis)} × ${F.heat} = ${fmt(keys().s2_loc,2)} t`,
+ s2_mb:()=>`Lyon ${S.dec.d_goo==='b'?'0 (GoOs bought)':fmt(D.elec.lyon)+' × residual '+F.frR}; Paris ${fmt(D.elec.paris)} × residual ${F.frR}; Lisbon 0 (GoOs in contract); Berlin ${fmt(D.elec.berlin)} × residual ${F.deR}; Paris heat × ${F.heat} = ${fmt(keys().s2_mb,2)} t`,
+ c3:()=>`Gas ${fmt(sum(D.gasLyon)+D.gasBerlin)} kWh × ${F.ngW} + diesel ${fmt(D.gen+sum(D.fleetDiesel))} L × ${F.dslW} + petrol ${fmt(sum(D.fleetPetrol))} L × ${F.petW} + FR electricity ${fmt(D.elec.lyon+D.elec.paris)} × ${F.frT} + PT ${fmt(D.elec.lisbon)} × ${F.ptT} + DE ${fmt(D.elec.berlin)} × ${F.deT} + heat ${fmt(D.heatParis)} × ${F.heatW} = ${fmt(keys().c3,2)} t`,
+ c1_kits:()=>`${fmt(D.kitsBought)} kits purchased × ${S.dec.d_pcf==='a'?D.kitVerified+' (verified PCF)':D.kitGeneric+' (supplier estimate)'} kg = ${fmt(keys().c1_kits,2)} t`,
+ c1_services:()=>`Only services not counted elsewhere: software ${D.services.software} k€ × ${F.software} + consulting ${D.services.consulting} × ${F.consulting} + marketing ${D.services.marketing} × ${F.marketing} + catering ${D.services.catering} × ${F.catering} + office supplies ${D.services.office} × ${F.office} = ${fmt(keys().c1_services,2)} t. Excluded: energy (Scope 1/2), cloud (own line), travel (Cat. 6), kits (own line), capitalised items (Cat. 2).`,
+ c2:()=>`${D.capex.laptops} laptops × ${F.laptop} + ${D.capex.monitors} monitors × ${F.monitor} + ${D.capex.servers} servers × ${F.server} + fit-out ${D.capex.fitout} k€ × ${F.fitout} = ${fmt(keys().c2,2)} t, 100% in 2025`,
+ c15:()=>`${D.bright.share*100}% × ${D.bright.s12} t = ${fmt(keys().c15,2)} t`,
+ c4:()=>{const tn=D.kitsBought*D.kitMass/1000;return `${fmt(tn,1)} t of kits. Sea ${fmt(tn*D.seaShare,2)} t × ${fmt(D.seaKm)} km × ${F.sea} + air ${fmt(tn*(1-D.seaShare),2)} t × ${fmt(D.airKm)} km × ${F.air} + truck ${fmt(tn,1)} t × ${fmt(D.truckKm)} km × ${F.truck} + parcel carrier ${D.parcel} t = ${fmt(keys().c4,2)} t`;},
+ c6:()=>{const rf=S.dec.d_rf==='b';return `Short-haul ${fmt(D.travel.short)} pkm × ${rf?F.shortRF:F.shortNo} + long-haul ${fmt(D.travel.long)} × ${rf?F.longRF:F.longNo} + train ${fmt(D.travel.train)} × ${F.train} + hotel ${fmt(D.travel.hotel)} × ${F.hotel} + car ${fmt(D.travel.car)} km × ${F.carKm} = ${fmt(keys().c6,2)} t (${rf?'with':'without'} RF)`;},
+ c7:()=>`${D.staff} staff × 2 × ${D.oneWay} km × ${D.officeDays} days × ${D.weeks} weeks = ${fmt(D.staff*2*D.oneWay*D.officeDays*D.weeks)} km; × (${D.car} × ${F.carKm} + ${D.pt} × ${F.ptKm})${S.dec.d_tele==='a'?` + teleworking ${D.staff} × ${D.homeDays} × ${D.weeks} days × ${F.home}`:''} = ${fmt(keys().c7,2)} t`,
+ c11:()=>{const g=sum(D.sales.map(s=>s[1]*s[2]));return `${D.kitW} W × 8,760 h × ${D.life} yr = ${fmt(D.kitW*8760*D.life/1000,1)} kWh per kit; × ${fmt(D.kitsSold)} kits sold × sales-weighted grid ${g.toFixed(4)} = ${fmt(keys().c11,2)} t`;},
+ c12:()=>`${fmt(D.kitsSold)} kits sold × ${D.eol} kg = ${fmt(keys().c12,2)} t`
+};
+
+/* ---- Files ---- */
+function viewFiles(){
+  const avail = FILES.filter(fileUnlocked);
+  const folders=[...new Set(avail.map(f=>f.folder))];
+  const tree = folders.map(fo=>`<div class="folder">${fo}</div>`+avail.filter(f=>f.folder===fo).map(f=>`<button class="file ${S.selFile===f.id?'sel':''} ${S.newFiles[f.id]?'new':''}" data-file="${f.id}">${f.name}</button>`).join('')).join('');
+  const f = FILES.find(x=>x.id===S.selFile && fileUnlocked(x));
+  const view = f ? `<div class="viewer"><button class="btn ghost mback" data-back="1">← Files</button>${f.render()}</div>` : `<div class="viewer"><div class="empty">Pick a file on the left. New files appear as stakeholders send them.</div></div>`;
+  return win('Files','Veltara shared drive',`<div class="tree">${tree}</div>${view}`,'split'+(S.mobileOpen&&f?' showing':''));
+}
+/* ---- Workbook ---- */
+function viewWB(){
+  const k=keys();
+  const get=id=>{const v=lineVal(id);return isNaN(v)?0:v;};
+  const s1=['s1_gas','s1_gen','s1_fgas','s1_fleet'].reduce((s,i)=>s+get(i),0);
+  const s3=LINES.filter(l=>l.id[0]==='c').reduce((s,l)=>s+get(l.id),0);
+  let html=`<div class="tot"><div><small>Scope 1</small><b>${fmt(s1,1)}</b></div><div><small>Scope 2 location</small><b>${fmt(get('s2_loc'),1)}</b></div><div><small>Scope 2 market</small><b>${fmt(get('s2_mb'),1)}</b></div><div><small>Scope 3</small><b>${fmt(s3,1)}</b></div><div><small>Total (location)</small><b>${fmt(s1+get('s2_loc')+s3,1)}</b></div></div>
+  <p class="lead" style="margin:0 0 10px;font-size:12.5px">All values in tonnes CO2e. A line unlocks when its data arrives. Values are checked when you send them from the email task.</p>
+  <table><thead><tr><th>Line</th><th>Method</th><th style="text-align:right">tCO2e</th><th>Status</th></tr></thead><tbody>`;
+  let g='';
+  LINES.forEach(L=>{
+    if(L.g!==g){g=L.g;html+=`<tr class="grp"><td colspan="4">${g}</td></tr>`;}
+    const locked=L.m>S.m; const st=S.lineStatus[L.id];
+    const val = L.auto ? (S.dec.d_cloud?fmt(k.c1_cloud,1):'') : (S.inputs[L.id]??'');
+    html+=`<tr class="${locked?'locked':''}"><td>${L.label}</td><td class="hint">${locked?'Waiting for data (mission '+L.m+')':L.hint}</td><td style="text-align:right"><input id="wb_${L.id}" data-wb="${L.id}" inputmode="decimal" value="${esc(val)}" ${locked||L.auto||S.taskDone[lineTaskKey(L.id)]?'readonly':''} aria-label="${esc(L.label)} in tCO2e"></td><td>${locked?'<span class="st pend">locked</span>':st?`<span class="st ${st}">${({ok:'✓',close:'≈',no:'✗',pend:'—'})[st]}</span>`:(L.auto&&S.dec.d_cloud?'<span class="st ok">set</span>':'<span class="st pend">to do</span>')}</td></tr>`;
+  });
+  html+='</tbody></table>';
+  return win('Carbon Workbook','FY2025 · GHG Protocol', `<div class="wb">${html}</div>`);
+}
+function lineTaskKey(id){ const m=lineMission(id); const M=MISSIONS[m]; const i=M.tasks.findIndex(t=>t.type==='inputs'&&t.lines.includes(id)); return m+'_'+i; }
+/* ---- EF ---- */
+function viewEF(){
+  const q=(S.efq||'').toLowerCase();
+  const rows=EFLIB.filter(r=>(r.join(' ')).toLowerCase().includes(q)).map(r=>`<tr><td class="c">${r[0]}</td><td>${r[1]}</td><td class="v">${typeof r[3]==='number'?r[3].toLocaleString('en-GB',{maximumFractionDigits:3}):r[3]}</td><td class="c">${r[2]}</td></tr>`).join('');
+  return win('Emission Factor Library','training values',`<div style="display:flex;flex-direction:column;flex:1;min-width:0"><div class="tools"><input id="efq" placeholder="Search: diesel, residual, flight…" value="${esc(S.efq||'')}" aria-label="Search factors"><span class="lead" style="font-size:12px">${EFLIB.length} factors</span></div><div class="scroll" style="flex:1"><table class="ef"><thead><tr><th>Group</th><th>Factor</th><th style="text-align:right">Value</th><th>Unit</th></tr></thead><tbody>${rows}</tbody></table></div></div>`);
+}
+/* ---- Calc ---- */
+function viewCalc(){
+  return win('Calculator','',`<div class="calc"><label for="calcin" class="lead" style="font-size:12.5px">Type an expression, e.g. <code>(412000+54000)*0.184/1000</code>, then press Enter.</label><input id="calcin" autocomplete="off" value="${esc(S.calcIn||'')}"><div class="res" id="calcres">${S.calcRes??'0'}</div><div class="hist">${S.calc.slice(-8).reverse().map(h=>`<button data-calchist="${esc(h.e)}">${esc(h.e)} = <b>${esc(h.r)}</b></button>`).join('')}</div></div>`);
+}
+function calcEval(e){ const s=e.replace(/,/g,'.').replace(/×/g,'*').replace(/÷/g,'/'); if(!/^[0-9+\-*/().\s%e]*$/i.test(s)) return 'Only numbers and + − × ÷ ( )'; try{ const v=Function('"use strict";return ('+s+')')(); return (typeof v==='number'&&isFinite(v))? (Math.round(v*10000)/10000).toString() : 'Error'; }catch(x){ return 'Error'; } }
+/* ---- Chat ---- */
+function viewChat(){
+  S.chat.forEach(c=>c.seen=true); save();
+  const msgs=S.chat.length?S.chat.map(c=>{const p=P[c.who];return `<div class="msg"><span class="avatar" style="background:${p.c}">${ini(p.n)}</span><div class="bubble"><b>${esc(p.n)} <time>· mission ${c.m}</time></b>${esc(c.text)}</div></div>`;}).join(''):'<div class="empty">No messages yet.</div>';
+  return win('Chat','#sustainability-project',`<div class="chat">${msgs}</div>`);
+}
+/* ---- Report ---- */
+function reportData(){
+  const v=id=>{const x=lineVal(id);return isNaN(x)?null:x;};
+  const s1=['s1_gas','s1_gen','s1_fgas','s1_fleet'].map(v); const S1=s1.every(x=>x!==null)?sum(s1):null;
+  const cats={1:['c1_kits','c1_cloud','c1_services'],2:['c2'],3:['c3'],4:['c4'],5:['c5'],6:['c6'],7:['c7'],8:[],9:[],10:[],11:['c11'],12:['c12'],13:[],14:[],15:['c15']};
+  const C={}; let S3=0, all=true;
+  Object.entries(cats).forEach(([c,ids])=>{ if(!ids.length){C[c]=0;return;} const xs=ids.map(v); if(xs.some(x=>x===null)){C[c]=null;all=false;} else {C[c]=sum(xs);S3+=C[c];} });
+  return {S1, S2L:v('s2_loc'), S2M:v('s2_mb'), C, S3: all?S3:null};
+}
+function viewReport(){
+  if(S.m<11) return win('Report','ESRS E1-6',`<div class="empty">The ESRS E1-6 table is built from your workbook. It opens with mission 11, once all the data is in.<br><br>Lines done so far: ${LINES.filter(l=>S.lineStatus[l.id]==='ok'||S.lineStatus[l.id]==='close'||(l.auto&&S.dec.d_cloud)).length}/${LINES.length}</div>`);
+  const R=reportData(); const f=x=>x===null?'<span style="color:var(--bad)">missing</span>':fmt(x,0);
+  const TL = (R.S1!==null&&R.S2L!==null&&R.S3!==null)?R.S1+R.S2L+R.S3:null, TM=(R.S1!==null&&R.S2M!==null&&R.S3!==null)?R.S1+R.S2M+R.S3:null;
+  const names={1:'Purchased goods and services',2:'Capital goods',3:'Fuel- and energy-related activities',4:'Upstream transportation and distribution',5:'Waste generated in operations',6:'Business travel',7:'Employee commuting',8:'Upstream leased assets',9:'Downstream transportation',10:'Processing of sold products',11:'Use of sold products',12:'End-of-life treatment of sold products',13:'Downstream leased assets',14:'Franchises',15:'Investments'};
+  const rp=S.report; const lock=!!S.final;
+  const row=(l,val,cls='')=>`<tr class="${cls}"><td class="${cls==='sub'?'ind':''}">${l}</td><td class="n">—</td><td class="n">${val}</td><td class="n">n/a</td></tr>`;
+  let h=`<h3>E1-6 · Gross Scopes 1, 2, 3 and total GHG emissions</h3><p class="lead" style="margin:0 0 4px;font-size:12.5px">Veltara Systems group · FY2025 · tCO2e · first sustainability statement, so comparatives are omitted.</p>
+  <div style="overflow-x:auto"><table><thead><tr><th>Indicator</th><th class="n">N-1 (2024)</th><th class="n">N (2025)</th><th class="n">% N/N-1</th></tr></thead><tbody>
+  <tr class="sec"><td colspan="4">Scope 1 GHG emissions</td></tr>${row('Gross Scope 1 GHG emissions',f(R.S1))}${row('Percentage of Scope 1 from regulated emission trading schemes','0%','sub')}
+  <tr class="sec"><td colspan="4">Scope 2 GHG emissions</td></tr>${row('Gross location-based Scope 2 GHG emissions',f(R.S2L))}${row('Gross market-based Scope 2 GHG emissions',f(R.S2M))}
+  <tr class="sec"><td colspan="4">Significant Scope 3 GHG emissions</td></tr>${row('Total gross indirect (Scope 3) GHG emissions',f(R.S3))}`;
+  for(let c=1;c<=15;c++){ const val=R.C[c]; h+=row(`${c}. ${names[c]}`, val===0&&[8,9,10,13,14].includes(c)?'<span style="color:var(--faint)">not relevant</span>':f(val),'sub'); }
+  h+=`<tr class="sec"><td colspan="4">Total GHG emissions</td></tr>${row('Total GHG emissions (location-based)',f(TL))}${row('Total GHG emissions (market-based)',f(TM))}</tbody></table></div>
+  <h3>GHG intensity per net revenue</h3><p class="lead" style="margin:0 0 6px;font-size:12.5px">Net revenue FY2025: €${D.revenue}M (group structure file). Enter tCO2e per € million.</p>
+  <table style="max-width:560px"><tbody><tr><td>Total GHG emissions (location-based) / net revenue</td><td class="n"><input id="int_l" data-rep="intL" inputmode="decimal" value="${esc(rp.intL||'')}" ${lock?'readonly':''} aria-label="Intensity location-based"></td></tr><tr><td>Total GHG emissions (market-based) / net revenue</td><td class="n"><input id="int_m" data-rep="intM" inputmode="decimal" value="${esc(rp.intM||'')}" ${lock?'readonly':''} aria-label="Intensity market-based"></td></tr></tbody></table>
+  <h3>Methodology choices</h3>
+  <table style="max-width:820px"><tbody>
+   <tr><td>Base year for targets</td><td><select id="base" data-rep="base" ${lock?'disabled':''}><option value="">Choose…</option><option value="2025" ${rp.base==='2025'?'selected':''}>2025: first complete, assured inventory</option><option value="2024" ${rp.base==='2024'?'selected':''}>2024: consultant estimate</option><option value="2019" ${rp.base==='2019'?'selected':''}>2019: pre-Covid, looks better for reductions</option></select></td></tr>
+   <tr><td>Carbon credits in E1-6 totals</td><td><select id="cred" data-rep="cred" ${lock?'disabled':''}><option value="">Choose…</option><option value="no" ${rp.cred==='no'?'selected':''}>Not netted. Any credits go to E1-7.</option><option value="yes" ${rp.cred==='yes'?'selected':''}>Netted against Scope 3</option></select></td></tr>
+   <tr><td>Share of Scope 3 from primary supplier data</td><td><select id="prim" data-rep="prim" ${lock?'disabled':''}><option value="">Choose…</option><option value="disc" ${rp.prim==='disc'?'selected':''}>Disclose the % (supplier-specific: cloud, carrier, kit PCF if obtained)</option><option value="none" ${rp.prim==='none'?'selected':''}>Not disclosed</option></select></td></tr>
+  </tbody></table>
+  ${lock?`<button class="btn" data-showfinal="1">See the auditor's conclusion</button>`:`<button class="btn" id="submitrep" ${TL===null?'disabled':''}>Submit to Kessler & Partners</button>${TL===null?' <span class="lead" style="font-size:12.5px">Complete every workbook line first.</span>':''}`}`;
+  return win('Report','ESRS E1 · climate change',`<div class="rep">${h}</div>`);
+}
+/* ---- Final ---- */
+function finalize(){
+  const k=keys(); let err=0, tot=0;
+  LINES.forEach(L=>{ const v=lineVal(L.id); tot+=Math.abs(k[L.id]); err+= isNaN(v)?Math.abs(k[L.id]):Math.abs(v-k[L.id]); });
+  const R=reportData(); const TL=R.S1+R.S2L+R.S3, TM=R.S1+R.S2M+R.S3;
+  const KL=['s1_gas','s1_gen','s1_fgas','s1_fleet'].reduce((s,i)=>s+k[i],0)+k.s2_loc+LINES.filter(l=>l.id[0]==='c').reduce((s,l)=>s+k[l.id],0);
+  const iL=parseNum(S.report.intL), iM=parseNum(S.report.intM);
+  const intOK = Math.abs(iL-TL/D.revenue)/(TL/D.revenue)<=0.03 && Math.abs(iM-TM/D.revenue)/(TM/D.revenue)<=0.03;
+  let audit=S.kpi.audit, trust=S.kpi.trust;
+  const notes=[];
+  if(!intOK){audit-=5;notes.push('GHG intensity per net revenue does not tie to your totals (total tCO2e ÷ €92.4M).');}
+  if(S.report.base==='2025'){audit+=3;} else if(S.report.base){audit-=4;notes.push('Base year: choose the first complete, verifiable inventory. A spend-only estimate or a cherry-picked year undermines the trajectory.');}
+  if(S.report.cred==='yes'){audit-=10;trust-=5;notes.push('Carbon credits were netted from gross emissions. ESRS E1-6 requires gross figures; credits belong in E1-7.');} else if(S.report.cred==='no') audit+=2;
+  if(S.report.prim==='disc') audit+=2; else if(S.report.prim==='none') notes.push('The share of Scope 3 calculated from primary data is expected in the disclosures.');
+  const reveals=Object.keys(S.revealed).length;
+  if(S.kpi.days<0){trust-=8;notes.push(`You missed the auditor's deadline by ${-S.kpi.days} working days.`);}
+  const acc=Math.max(0,1-err/tot)*100;
+  audit=clamp(audit,0,100); trust=clamp(trust,0,100);
+  const badDec=Object.entries(S.dec).filter(([id,o])=>{const tk=allDecisions().find(t=>t.id===id);return tk&&tk.opts.find(x=>x.id===o)?.v==='bad';}).length;
+  let op='u'; if(acc<90||audit<55||badDec>=3) op='q'; if(acc<75||audit<35||S.dec.d_cat11==='a'&&S.report.cred==='yes') op='a';
+  S.final={acc,audit,trust,TL,TM,KL,op,notes,reveals,days:S.kpi.days};
+  S.taskDone['11_0']=true;
+  S.showFinal=true; save(); render();
+}
+function allDecisions(){ const out=[]; MISSIONS.forEach(M=>M&&M.tasks.forEach(t=>{if(t.type==='decision')out.push(t);})); return out; }
+function viewFinal(){
+  const F_=S.final;
+  const opText={u:['Unqualified limited assurance conclusion','"Based on the procedures performed and the evidence obtained, nothing has come to our attention that causes us to believe that the GHG emissions disclosures (ESRS E1-6) of Veltara Systems are not prepared, in all material respects, in accordance with ESRS and the GHG Protocol."'],
+   q:['Qualified conclusion (with reservations)','"Except for the matters described in the basis for qualified conclusion, nothing has come to our attention…" The issues found must be corrected or disclosed before publication.'],
+   a:['Adverse conclusion: figures cannot be published as they are','The misstatements are material and pervasive. The board pack is postponed and the bank covenant is at risk.']}[F_.op];
+  const deb=allDecisions().map(t=>{const ch=t.opts.find(o=>o.id===S.dec[t.id]);const best=t.opts.find(o=>o.v==='best');return `<div class="deb"><div class="k">${t.ref}</div><b>${t.q}</b><br>Your choice: ${ch?ch.l:'—'} ${ch?`<span class="pill ${ch.v}">${ch.v}</span>`:''}${ch&&ch.v!=='best'?`<br><span class="lead">Expert choice: ${best.l}</span>`:''}</div>`;}).join('');
+  const k=keys();
+  const lines=LINES.map(L=>{const v=lineVal(L.id);return `<tr><td>${L.label}</td><td class="n">${isNaN(v)?'—':fmt(v,1)}</td><td class="n">${fmt(k[L.id],1)}</td></tr>`;}).join('');
+  return `<div class="ovl"><div class="card"><p class="caption" style="text-align:left">Kessler & Partners · limited assurance report · ESRS E1-6</p><h2>${opText[0]}</h2><p class="lead">${opText[1]}</p>
+   <div class="scores"><div><small>Accuracy vs evidence</small><b>${Math.round(F_.acc)}%</b></div><div><small>Audit readiness</small><b>${F_.audit}</b></div><div><small>Stakeholder trust</small><b>${F_.trust}</b></div><div><small>Days left</small><b>${F_.days}</b></div></div>
+   <div class="opinion ${F_.op==='u'?'':F_.op}"><h4>Your reported totals</h4>Total GHG emissions: <b>${fmt(F_.TL,0)} tCO2e</b> location-based, <b>${fmt(F_.TM,0)} tCO2e</b> market-based. The consultant's 2024 estimate was ~2,100 t: spend-only, with no use phase. ${F_.reveals?`<br>You used the expert working on ${F_.reveals} line(s).`:''}${F_.notes.length?'<ul>'+F_.notes.map(n=>`<li>${n}</li>`).join('')+'</ul>':''}</div>
+   <h3 style="font-family:var(--display)">What you learned, decision by decision</h3>${deb}
+   <h3 style="font-family:var(--display);margin-top:18px">Your workbook vs the evidence (given your choices)</h3><div class="rep" style="padding:0"><table><thead><tr><th>Line</th><th class="n">You</th><th class="n">Evidence</th></tr></thead><tbody>${lines}</tbody></table></div>
+   <p class="lead">Use of sold kits (Cat. 11), purchased goods and services, and business travel make up most of the footprint of this "software" company. Those three are where the transition plan (ESRS E1-1) should focus.</p>
+   <button class="btn" data-closefinal="1">Back to the laptop</button> <button class="btn ghost" data-restart="1">Play again</button></div></div>`;
+}
+
+/* ============ EVENTS ============ */
+function bindView(){}
+document.addEventListener('click', e=>{
+  const b=e.target.closest('button, [data-mail]'); if(!b) return;
+  const ds=b.dataset;
+  if(ds.app){ S.app=ds.app; S.mobileOpen=false; if(ds.app==='files'&&S.selFile){} save(); render(); return; }
+  if(ds.mail){ S.selMail=+ds.mail; S.read[ds.mail]=true; S.mobileOpen=true; save(); render(); document.querySelector('.read')?.scrollTo(0,0); return; }
+  if(ds.back){ S.mobileOpen=false; render(); return; }
+  if(ds.open||ds.file){ const id=ds.open||ds.file; S.app='files'; S.selFile=id; S.seen[id]=true; delete S.newFiles[id]; S.mobileOpen=true; save(); render(); return; }
+  if(ds.goapp){ S.app=ds.goapp; S.mobileOpen=false; save(); render(); return; }
+  if(ds.decide){ const sel=document.querySelector(`input[name="${ds.tid}"]:checked`); if(!sel){toast('Pick an option first.');return;}
+    const [n,i]=ds.decide.split('_').map(Number); const tk=MISSIONS[n].tasks[i]; const o=tk.opts.find(x=>x.id===sel.value);
+    S.dec[tk.id]=o.id; S.taskDone[ds.decide]=true; applyFx(o.fx);
+    if(tk.id==='d_pcf'&&o.id==='a'){ S.newFiles.f_kitpcf2=true; toast('<b>Formosa IoT</b> sent the verified PCF (Procurement folder).'); }
+    if(tk.id==='d_cloud'){ S.lineStatus.c1_cloud='ok'; }
+    completeMissionIfDone(n); save(); render(); return; }
+  if(ds.multisend){ const [n,i]=ds.multisend.split('_').map(Number); const tk=MISSIONS[n].tasks[i]; const sel=S.multi[tk.id]||{};
+    const right=tk.items.filter(([c,,rel])=>!!sel[c]===rel).length; applyFx({audit:Math.round((right-11)*2)}); S.taskDone[ds.multisend]=true; completeMissionIfDone(n); save(); render(); return; }
+  if(ds.checksend){ const [n,i]=ds.checksend.split('_').map(Number); const tk=MISSIONS[n].tasks[i];
+    S.attempts[ds.checksend]=(S.attempts[ds.checksend]||0)+1;
+    let allGood=true; tk.lines.forEach(id=>{const st=status(id); S.lineStatus[id]=st; if(st==='no'||st==='pend') allGood=false;});
+    if(allGood){ const closes=tk.lines.filter(id=>S.lineStatus[id]==='close').length; applyFx({audit:S.attempts[ds.checksend]===1?3:0}); if(closes) applyFx({audit:-closes});
+      S.taskDone[ds.checksend]=true; toast(`<b>Sent to ${esc(P[tk.to].n)}</b><br>Calculations accepted${closes?', with small differences noted':''}.`); completeMissionIfDone(n);}
+    else { applyFx({audit:-1}); toast(S.attempts[ds.checksend]>=2?'Some lines are still off. You can open the expert working (it costs audit points).':'Some lines do not match the evidence. Re-check units, perimeter and double counting.'); }
+    save(); render(); return; }
+  if(ds.reveal){ const id=ds.reveal; S.revealed[id]=true; S.inputs[id]=String(r2(keys()[id])); S.lineStatus[id]='ok'; applyFx({audit:-3}); save(); render(); return; }
+  if(ds.calchist){ S.calcIn=ds.calchist; render(); document.getElementById('calcin')?.focus(); return; }
+  if(b.id==='submitrep'){ finalize(); return; }
+  if(ds.showfinal){ S.showFinal=true; save(); render(); return; }
+  if(ds.closefinal){ S.showFinal=false; save(); render(); return; }
+  if(ds.restart){ restart(); return; }
+});
+document.addEventListener('change', e=>{
+  const el=e.target;
+  if(el.dataset.multi){ const m=S.multi[el.dataset.multi]=S.multi[el.dataset.multi]||{}; m[el.value]=el.checked; save(); return; }
+  if(el.dataset.rep){ S.report[el.dataset.rep]=el.value; save(); return; }
+  if(el.type==='radio'){ el.closest('.task-b').querySelectorAll('.opt').forEach(o=>o.classList.remove('chosen')); el.closest('.opt').classList.add('chosen'); }
+});
+document.addEventListener('input', e=>{
+  const el=e.target;
+  if(el.dataset.wb){ S.inputs[el.dataset.wb]=el.value; delete S.lineStatus[el.dataset.wb]; save(); return; }
+  if(el.dataset.rep){ S.report[el.dataset.rep]=el.value; save(); return; }
+  if(el.id==='efq'){ S.efq=el.value; const pos=el.selectionStart; render(); const n=document.getElementById('efq'); n.focus(); n.setSelectionRange(pos,pos); return; }
+  if(el.id==='calcin'){ S.calcIn=el.value; }
+});
+document.addEventListener('keydown', e=>{
+  if(e.target.id==='calcin' && e.key==='Enter'){ const ex=e.target.value.trim(); if(!ex) return; const r=calcEval(ex); S.calcRes=r; if(r!=='Error'&&!r.startsWith('Only')) S.calc.push({e:ex,r}); save(); render(); const n=document.getElementById('calcin'); n.focus(); }
+});
+function restart(){ try{localStorage.removeItem(KEY);}catch(e){} S=structuredClone(START); S.seen._init=true; unlockMission(1); save(); render(); }
+document.getElementById('restart').addEventListener('click', restart);
+S.read[S.selMail]=S.read[S.selMail]||false;
+render();
+})();
+</script>
