@@ -234,7 +234,7 @@ footer.page b{color:var(--ink)}
 <div class="wrap">
   <div class="top">
     <a class="logo" href="#catalogue"><b>AISM</b><span>Academy</span></a>
-    <nav aria-label="Sections"><a href="#catalogue">Catalogue</a><a href="#routes">Routes</a><a href="#credentials">Credentials</a><a href="#teams">Teams</a><a href="#notes">Notes</a></nav>
+    <nav aria-label="Sections"><a href="#catalogue">Catalogue</a><a href="#routes">Routes</a><a href="#credentials">Credentials</a><a href="#notes">Notes</a></nav>
   </div>
 
   <div class="hero">
@@ -242,7 +242,7 @@ footer.page b{color:var(--ink)}
       <div class="kicker">Learn sustainability work by doing it</div>
       <h1>Every tonne has to pass the <span class="circled">audit.<svg viewBox="0 0 200 100" preserveAspectRatio="none" aria-hidden="true"><path d="M18 58 C 10 24, 80 6, 140 12 C 196 18, 204 64, 160 84 C 110 102, 30 96, 14 66 C 6 50, 30 34, 60 28"/></svg></span></h1>
       <p class="lede">Live seasons, carbon and reporting simulations, short foundation lessons and AI tool labs. You do the job inside a company, defend your numbers, and an auditor reviews them at the end.</p>
-      <div class="promise"><svg class="tick" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 13 L9 19 L21 4"/></svg><span><b>Open and free during launch.</b> Anything you start for free stays free for you.</span></div>
+      <div class="promise"><svg class="tick" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 13 L9 19 L21 4"/></svg><span><b>Free and open to everyone.</b> No fee and no sign-up. Sign in with Google only to save your progress.</span></div>
       <div class="ctas"><a class="btn" href="#routes">Take the 3-minute placement test</a><a class="btn ghost" href="#catalogue">Open the catalogue</a></div>
     </div>
 
@@ -282,7 +282,7 @@ footer.page b{color:var(--ink)}
       <span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 13 L9 19 L21 4"/></svg>Live: open now</span>
       <span><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M8 12.5 L11 15.5 L16 9"/></svg>Beta: open, still being reviewed</span>
       <span class="s"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8" stroke-dasharray="3 3"/></svg>Scheduled: not open yet</span>
-      <span>All lines: free during launch</span>
+      <span>Every line is free</span>
     </div>
   </section>
 
@@ -305,30 +305,18 @@ footer.page b{color:var(--ink)}
     </div>
   </section>
 
-  <section id="teams">
-    <div class="engage">
-      <span class="stamp">Pilot · spring 2027</span>
-      <div><h2>Training a whole team?</h2><p>Teams get a shared Carbon Desk ledger, a leaderboard across colleagues, an admin view and a facilitator guide. Ask for an engagement letter and we'll set up the pilot with you.</p></div>
-      <form id="teamForm" novalidate>
-        <label for="teamEmail">Work email</label>
-        <div class="fld"><input id="teamEmail" type="email" placeholder="name@company.com" autocomplete="email"><button type="submit">Request a letter</button></div>
-        <div class="note" id="teamNote" aria-live="polite"></div>
-      </form>
-    </div>
-  </section>
 
   <section id="notes">
     <div class="sh"><div class="ref">N</div><div><h2>Notes to the catalogue</h2><p>What people ask before they start.</p></div></div>
     <div class="notes">
-      <details><summary><span class="n">Note 1</span>Is it really free?</summary><p>Yes. Every programme is open and free during launch, with no sign-up. Sign in with Google only if you want to save progress across devices.</p></details>
-      <details><summary><span class="n">Note 2</span>Will it stay free?</summary><p>Foundations lessons, the live Season and Carbon Desk Case 01 stay free. Deeper programmes and certificates may become paid later. Anything you start for free stays free for you.</p></details>
-      <details><summary><span class="n">Note 3</span>Do I need to buy a book?</summary><p>No. Books are optional field manuals. Every programme and certificate can be completed without them.</p></details>
-      <details><summary><span class="n">Note 4</span>Is the certificate accredited?</summary><p>Certificates show what you completed and how you were assessed. They are not issued by an accreditation body. Project managers can claim self-reported PDUs.</p></details>
-      <details><summary><span class="n">Note 5</span>Are the companies real?</summary><p>No. Halden Pumpworks, Veltara Systems and every case are fictional, built from real-world situations. Emission factors in simulations are rounded training values.</p></details>
+      <details><summary><span class="n">Note 1</span>Is it really free?</summary><p>Yes. Every programme is free and open, with no sign-up. Sign in with Google only if you want to save progress across devices.</p></details>
+      <details><summary><span class="n">Note 2</span>Do I need to buy a book?</summary><p>No. Books are optional field manuals. Every programme and certificate can be completed without them.</p></details>
+      <details><summary><span class="n">Note 3</span>Is the certificate accredited?</summary><p>Certificates show what you completed and how you were assessed. They are not issued by an accreditation body. Project managers can claim self-reported PDUs.</p></details>
+      <details><summary><span class="n">Note 4</span>Are the companies real?</summary><p>No. Halden Pumpworks, Veltara Systems and every case are fictional, built from real-world situations. Emission factors in simulations are rounded training values.</p></details>
     </div>
   </section>
 
-  <footer class="page"><span><b>AISM Academy</b> by Jad Dellel · The AI-Powered Sustainability Manager</span><span>AI drafts, people decide. Educational content, not legal, financial or assurance advice.</span></footer>
+  <footer class="page"><span><b>AISM Academy</b> · The AI-Powered Sustainability Manager</span><span>AI drafts, people decide. Educational content, not legal, financial or assurance advice.</span></footer>
 </main>
 
 <script>
@@ -383,7 +371,7 @@ footer.page b{color:var(--ink)}
       P.forEach((p,i)=>{ if(p.a!==code) return; n++; if(!ok(p)) return;
         const ref=`${code}.${n}`, isOpen=open===i;
         html+=`<button class="lrow" aria-expanded="${isOpen}" aria-controls="d${i}" data-i="${i}"><span class="ref">${ref}</span><span class="title">${esc(p.t)}${p.hot?`<em>${p.hot}</em>`:''}</span><span class="cell lvl">${lvl(p)}</span><span class="cell fmt">${FMT[p.f]}</span><span class="cell dur">${p.dur}</span><span class="st"><span class="status ${p.s}">${ICON[p.s]}${ST[p.s]}</span></span><span class="chev" aria-hidden="true">+</span><span class="meta"><span class="cell">Lv ${lvl(p)}</span><span class="cell">${FMT[p.f]}</span><span class="cell">${p.dur}</span><span class="status ${p.s}">${ICON[p.s]}${ST[p.s]}</span></span></button>`;
-        html+=`<div class="detail" id="d${i}" ${isOpen?'':'hidden'}><div></div><div><p>${esc(p.d)}</p><button class="go" data-go="${i}">${esc(p.cta)} →</button></div><div><dl>${p.x.map(r=>`<dt>${esc(r[0])}</dt><dd>${esc(r[1])}</dd>`).join('')}<dt>Price</dt><dd>Free during launch</dd></dl></div></div>`;
+        html+=`<div class="detail" id="d${i}" ${isOpen?'':'hidden'}><div></div><div><p>${esc(p.d)}</p><button class="go" data-go="${i}">${esc(p.cta)} →</button></div><div><dl>${p.x.map(r=>`<dt>${esc(r[0])}</dt><dd>${esc(r[1])}</dd>`).join('')}<dt>Cost</dt><dd>Free</dd></dl></div></div>`;
       });
     });
     document.getElementById('rows').innerHTML=html||'<div class="empty">No line matches these filters. Clear one to see more.</div>';
@@ -402,7 +390,5 @@ footer.page b{color:var(--ink)}
   function tick(){let d=Math.max(0,target-Date.now());const D=Math.floor(d/864e5);d-=D*864e5;const H=Math.floor(d/36e5);d-=H*36e5;const M=Math.floor(d/6e4);d-=M*6e4;const S=Math.floor(d/1e3);
     document.getElementById('cd-d').textContent=D;document.getElementById('cd-h').textContent=pad(H);document.getElementById('cd-m').textContent=pad(M);document.getElementById('cd-s').textContent=pad(S);}
   tick(); setInterval(tick,1000);
-  document.getElementById('teamForm').addEventListener('submit',e=>{e.preventDefault();const v=document.getElementById('teamEmail').value.trim();const n=document.getElementById('teamNote');
-    n.textContent=/.+@.+\..+/.test(v)?'Noted. In the live academy this requests a pilot engagement letter.':'Enter a work email, for example name@company.com.';});
 })();
 </script>
